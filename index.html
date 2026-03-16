@@ -3,1337 +3,691 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ImmoVerwalt – Mietverwaltung</title>
+<title>ImmoVerwalt</title>
 <style>
-  :root {
-    --bg:        #F5F3EE;
-    --surface:   #FFFFFF;
-    --border:    #DDD8CF;
-    --text:      #1C1A16;
-    --muted:     #7A756A;
-    --accent:    #2B5F3F;
-    --accent-lt: #E8F1EC;
-    --warn:      #B85C2A;
-    --warn-lt:   #FAF0EA;
-    --info:      #1D4E7A;
-    --info-lt:   #EAF1FA;
-    --nav-w:     240px;
-    --radius:    8px;
-    --shadow:    0 2px 8px rgba(0,0,0,0.08);
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: Georgia, 'Times New Roman', serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-  }
-
-  /* ── SIDEBAR ── */
-  #sidebar {
-    width: var(--nav-w);
-    min-height: 100vh;
-    background: var(--text);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0; left: 0;
-    z-index: 100;
-  }
-  #sidebar .logo {
-    padding: 28px 24px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  #sidebar .logo h1 {
-    font-family: Georgia, serif;
-    font-size: 1.4rem;
-    letter-spacing: 0.02em;
-    color: #fff;
-  }
-  #sidebar .logo p { font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-top:2px; }
-  nav { flex: 1; padding: 16px 0; }
-  nav a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 24px;
-    color: rgba(255,255,255,0.65);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: all .15s;
-    cursor: pointer;
-    border-left: 3px solid transparent;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  nav a:hover { color:#fff; background: rgba(255,255,255,0.06); }
-  nav a.active { color:#fff; border-left-color: #6DBD8A; background: rgba(255,255,255,0.08); }
-  nav a .icon { font-size: 1.1rem; width:22px; text-align:center; }
-  nav .nav-section {
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: rgba(255,255,255,0.3);
-    padding: 16px 24px 4px;
-  }
-  #sidebar .version {
-    padding: 16px 24px;
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.25);
-    border-top: 1px solid rgba(255,255,255,0.08);
-  }
-
-  /* ── MAIN ── */
-  #main {
-    margin-left: var(--nav-w);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  #topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky; top: 0; z-index: 50;
-  }
-  #topbar h2 { font-family:Georgia,serif; font-size:1.35rem; font-weight:600; }
-  #topbar .sub { font-size:0.82rem; color:var(--muted); margin-top:1px; }
-  #topbar .actions { display:flex; gap:10px; }
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 16px; border-radius: var(--radius);
-    font-family: inherit; font-size: 0.85rem; font-weight: 600;
-    cursor: pointer; border: none; transition: all .15s;
-  }
-  .btn-primary { background: var(--accent); color:#fff; }
-  .btn-primary:hover { background: #224d32; }
-  .btn-secondary { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
-  .btn-secondary:hover { background: var(--bg); }
-  .btn-danger { background: var(--warn); color:#fff; }
-  .btn-danger:hover { background: #963f1a; }
-  .btn-sm { padding: 5px 10px; font-size: 0.78rem; }
-
-  #content { padding: 32px; flex: 1; }
-
-  /* ── CARDS ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-  }
-  .card-header {
-    padding: 18px 22px 14px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .card-header h3 { font-family:Georgia,serif; font-size:1.05rem; font-weight:600; }
-  .card-body { padding: 22px; }
-
-  /* ── GRID ── */
-  .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:24px; }
-  .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
-  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-
-  /* ── STAT CARD ── */
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-    box-shadow: var(--shadow);
-  }
-  .stat-card .label { font-size:0.78rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.06em; }
-  .stat-card .value { font-family:Georgia,serif; font-size:2rem; font-weight:700; margin: 6px 0 4px; }
-  .stat-card .note { font-size:0.78rem; color:var(--muted); }
-  .stat-card.green .value { color: var(--accent); }
-  .stat-card.red .value { color: var(--warn); }
-  .stat-card.blue .value { color: var(--info); }
-
-  /* ── TABLE ── */
-  table { width:100%; border-collapse:collapse; font-size:0.88rem; }
-  thead th {
-    text-align:left; padding: 10px 14px;
-    font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
-    color: var(--muted); background: var(--bg); border-bottom: 1px solid var(--border);
-  }
-  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--bg); }
-  tbody td { padding: 12px 14px; vertical-align: middle; }
-
-  /* ── BADGES ── */
-  .badge {
-    display:inline-block; padding: 3px 10px; border-radius: 20px;
-    font-size: 0.73rem; font-weight: 700;
-  }
-  .badge-green { background: var(--accent-lt); color: var(--accent); }
-  .badge-red   { background: var(--warn-lt);   color: var(--warn);   }
-  .badge-blue  { background: var(--info-lt);   color: var(--info);   }
-  .badge-gray  { background: var(--bg);        color: var(--muted);  border:1px solid var(--border); }
-
-  /* ── FORM ── */
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display:block; font-size:0.82rem; font-weight:600; color:var(--muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:.05em; }
-  .form-group input, .form-group select, .form-group textarea {
-    width:100%; padding: 9px 12px;
-    border: 1.5px solid var(--border); border-radius: var(--radius);
-    font-family:inherit; font-size:0.9rem; color:var(--text);
-    background: var(--surface); transition: border-color .15s;
-  }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-    outline:none; border-color: var(--accent);
-  }
-  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    display:none; position:fixed; inset:0;
-    background: rgba(0,0,0,0.45); z-index:200;
-    align-items:center; justify-content:center;
-  }
-  .modal-overlay.open { display:flex; }
-  .modal {
-    background: var(--surface); border-radius: var(--radius);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    width: 560px; max-width: 95vw; max-height:90vh;
-    display:flex; flex-direction:column;
-  }
-  .modal-header {
-    padding: 20px 24px 16px; border-bottom:1px solid var(--border);
-    display:flex; align-items:center; justify-content:space-between;
-  }
-  .modal-header h3 { font-family:Georgia,serif; font-size:1.1rem; }
-  .modal-close { background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--muted); }
-  .modal-body { padding:24px; overflow-y:auto; }
-  .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
-
-  /* ── PAGES ── */
-  .page { display:none; }
-  .page.active { display:block; }
-
-  /* ── ALERT ── */
-  .alert {
-    padding: 12px 16px; border-radius:var(--radius); font-size:0.88rem;
-    display:flex; align-items:center; gap:10px; margin-bottom:16px;
-  }
-  .alert-success { background: var(--accent-lt); color: var(--accent); border:1px solid #b8ddc6; }
-  .alert-warning  { background: var(--warn-lt);   color: var(--warn);   border:1px solid #f0c4a8; }
-
-  /* ── EMPTY STATE ── */
-  .empty {
-    text-align:center; padding:60px 20px; color:var(--muted);
-  }
-  .empty .icon { font-size:3rem; margin-bottom:12px; }
-  .empty p { font-size:0.9rem; }
-
-  /* ── MISC ── */
-  .flex { display:flex; }
-  .flex-between { display:flex; justify-content:space-between; align-items:center; }
-  .gap-8 { gap:8px; }
-  .mt-16 { margin-top:16px; }
-  .mt-24 { margin-top:24px; }
-  .text-muted { color:var(--muted); font-size:0.85rem; }
-  .text-right { text-align:right; }
-  .bold { font-weight:700; }
-  .divider { border:none; border-top:1px solid var(--border); margin:20px 0; }
-  .tag { display:inline-block; background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:2px 8px; font-size:0.75rem; color:var(--muted); }
-
-  /* Kalender */
-  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
-  .cal-day-name { text-align:center; font-size:0.72rem; font-weight:700; color:var(--muted); padding:6px 0; text-transform:uppercase; }
-  .cal-day {
-    text-align:center; padding:8px 4px; border-radius:6px;
-    font-size:0.85rem; cursor:pointer; transition:background .1s;
-    min-height:36px; position:relative;
-  }
-  .cal-day:hover { background:var(--bg); }
-  .cal-day.today { background:var(--accent); color:#fff; font-weight:700; }
-  .cal-day.other-month { color:var(--border); }
-  .cal-day .dot { width:5px;height:5px;border-radius:50%;background:var(--warn);margin:2px auto 0; }
-  .cal-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-  .cal-nav button { background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.9rem; }
+:root{--bg:#F5F3EE;--surface:#FFFFFF;--border:#DDD8CF;--text:#1C1A16;--muted:#7A756A;--accent:#2B5F3F;--accent-lt:#E8F1EC;--warn:#B85C2A;--warn-lt:#FAF0EA;--info:#1D4E7A;--info-lt:#EAF1FA;--nav-w:240px;--radius:8px;--shadow:0 2px 8px rgba(0,0,0,0.08)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+#sidebar{width:var(--nav-w);min-height:100vh;background:var(--text);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+#sidebar .logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.1)}
+#sidebar .logo h1{font-family:Georgia,serif;font-size:1.4rem;color:#fff}
+#sidebar .logo p{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:2px}
+nav{flex:1;padding:16px 0}
+nav a{display:flex;align-items:center;gap:12px;padding:11px 24px;color:rgba(255,255,255,.65);text-decoration:none;font-size:.9rem;font-weight:500;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+nav a:hover{color:#fff;background:rgba(255,255,255,.06)}
+nav a.active{color:#fff;border-left-color:#6DBD8A;background:rgba(255,255,255,.08)}
+nav a .icon{font-size:1.1rem;width:22px;text-align:center}
+nav .nav-section{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);padding:16px 24px 4px}
+#sidebar .version{padding:16px 24px;font-size:.72rem;color:rgba(255,255,255,.25);border-top:1px solid rgba(255,255,255,.08)}
+#main{margin-left:var(--nav-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+#topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+#topbar h2{font-family:Georgia,serif;font-size:1.35rem;font-weight:600}
+#topbar .sub{font-size:.82rem;color:var(--muted);margin-top:1px}
+#topbar .actions{display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-family:inherit;font-size:.85rem;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#224d32}
+.btn-secondary{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:var(--bg)}
+.btn-sm{padding:5px 10px;font-size:.78rem}
+#content{padding:32px;flex:1}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-header h3{font-family:Georgia,serif;font-size:1.05rem;font-weight:600}
+.card-body{padding:22px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+.stat-card .label{font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.stat-card .value{font-family:Georgia,serif;font-size:2rem;font-weight:700;margin:6px 0 4px}
+.stat-card .note{font-size:.78rem;color:var(--muted)}
+.stat-card.green .value{color:var(--accent)}
+.stat-card.red .value{color:var(--warn)}
+.stat-card.blue .value{color:var(--info)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead th{text-align:left;padding:10px 14px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg)}
+tbody td{padding:12px 14px;vertical-align:middle}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.73rem;font-weight:700}
+.badge-green{background:var(--accent-lt);color:var(--accent)}
+.badge-red{background:var(--warn-lt);color:var(--warn)}
+.badge-blue{background:var(--info-lt);color:var(--info)}
+.badge-gray{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:.9rem;color:var(--text);background:var(--surface);transition:border-color .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,.2);width:560px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-family:Georgia,serif;font-size:1.1rem}
+.modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted)}
+.modal-body{padding:24px;overflow-y:auto}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.page{display:none}
+.page.active{display:block}
+.alert{padding:12px 16px;border-radius:var(--radius);font-size:.88rem;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.alert-success{background:var(--accent-lt);color:var(--accent);border:1px solid #b8ddc6}
+.alert-warning{background:var(--warn-lt);color:var(--warn);border:1px solid #f0c4a8}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .icon{font-size:3rem;margin-bottom:12px}
+.empty p{font-size:.9rem}
+.text-muted{color:var(--muted);font-size:.85rem}
+.bold{font-weight:700}
+.mt-24{margin-top:24px}
+.tag{display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.75rem;color:var(--muted)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day-name{text-align:center;font-size:.72rem;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase}
+.cal-day{text-align:center;padding:8px 4px;border-radius:6px;font-size:.85rem;cursor:pointer;transition:background .1s;min-height:36px;position:relative}
+.cal-day:hover{background:var(--bg)}
+.cal-day.today{background:var(--accent);color:#fff;font-weight:700}
+.cal-day.other-month{color:var(--border)}
+.cal-day .dot{width:5px;height:5px;border-radius:50%;background:var(--warn);margin:2px auto 0}
+.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.cal-nav button{background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.9rem}
 </style>
 </head>
-<body>
-
-<!-- ═══ SIDEBAR ═══ -->
-<aside id="sidebar">
-  <div class="logo">
-    <h1>🏠 ImmoVerwalt</h1>
-    <p>Mietverwaltung</p>
-  </div>
+<body><aside id="sidebar">
+  <div class="logo"><h1>🏠 ImmoVerwalt</h1><p>Mietverwaltung</p></div>
   <nav>
     <div class="nav-section">Übersicht</div>
-    <a data-page="dashboard" id="nav-dashboard" class="active">
-      <span class="icon">📊</span> Dashboard
-    </a>
+    <a onclick="showPage('dashboard')" id="nav-dashboard" class="active"><span class="icon">📊</span> Dashboard</a>
     <div class="nav-section">Verwaltung</div>
-    <a data-page="objekte" id="nav-objekte">
-      <span class="icon">🏠</span> Objekte
-    </a>
-    <a data-page="mieter" id="nav-mieter">
-      <span class="icon">👥</span> Mieter
-    </a>
-    <a data-page="mieteingang" id="nav-mieteingang">
-      <span class="icon">💶</span> Mieteingang
-    </a>
-    <div class="nav-section">Finanzen & Dokumente</div>
-    <a data-page="kosten" id="nav-kosten">
-      <span class="icon">🧾</span> Kosten & Ausgaben
-    </a>
-    <a data-page="vertraege" id="nav-vertraege">
-      <span class="icon">📄</span> Verträge & Dokumente
-    </a>
+    <a onclick="showPage('objekte')" id="nav-objekte"><span class="icon">🏠</span> Objekte</a>
+    <a onclick="showPage('mieter')" id="nav-mieter"><span class="icon">👥</span> Mieter</a>
+    <a onclick="showPage('mieteingang')" id="nav-mieteingang"><span class="icon">💶</span> Mieteingang</a>
+    <div class="nav-section">Finanzen</div>
+    <a onclick="showPage('kosten')" id="nav-kosten"><span class="icon">🧾</span> Kosten</a>
+    <a onclick="showPage('vertraege')" id="nav-vertraege"><span class="icon">📄</span> Vertraege</a>
     <div class="nav-section">Planung</div>
-    <a data-page="aufgaben" id="nav-aufgaben">
-      <span class="icon">✅</span> Aufgaben
-    </a>
-    <a data-page="kalender" id="nav-kalender">
-      <span class="icon">📅</span> Kalender
-    </a>
+    <a onclick="showPage('aufgaben')" id="nav-aufgaben"><span class="icon">✅</span> Aufgaben</a>
+    <a onclick="showPage('kalender')" id="nav-kalender"><span class="icon">📅</span> Kalender</a>
   </nav>
-  <div class="version">Version 1.0 – Lokale Datenspeicherung</div>
+  <div class="version">Version 1.0</div>
 </aside>
-
-<!-- ═══ MAIN ═══ -->
 <div id="main">
   <div id="topbar">
-    <div>
-      <h2 id="page-title">Dashboard</h2>
-      <div class="sub" id="page-sub">Guten Überblick behalten</div>
-    </div>
+    <div><h2 id="page-title">Dashboard</h2><div class="sub" id="page-sub">Ihr Ueberblick</div></div>
     <div class="actions" id="topbar-actions"></div>
   </div>
   <div id="content">
-
-    <!-- ══ DASHBOARD ══ -->
     <div id="page-dashboard" class="page active">
       <div class="grid-4" id="dash-stats"></div>
       <div class="grid-2">
-        <div class="card">
-          <div class="card-header"><h3>⚠️ Offene Mieten diesen Monat</h3></div>
-          <div class="card-body" id="dash-offene-mieten"></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><h3>✅ Anstehende Aufgaben</h3></div>
-          <div class="card-body" id="dash-aufgaben"></div>
-        </div>
+        <div class="card"><div class="card-header"><h3>Offene Mieten</h3></div><div class="card-body" id="dash-offene-mieten"></div></div>
+        <div class="card"><div class="card-header"><h3>Aufgaben</h3></div><div class="card-body" id="dash-aufgaben"></div></div>
       </div>
-      <div class="mt-24">
-        <div class="card">
-          <div class="card-header"><h3>📋 Meine Objekte</h3></div>
-          <div class="card-body" id="dash-objekte"></div>
-        </div>
-      </div>
+      <div class="mt-24"><div class="card"><div class="card-header"><h3>Meine Objekte</h3></div><div class="card-body" id="dash-objekte"></div></div></div>
     </div>
-
-    <!-- ══ OBJEKTE ══ -->
-    <div id="page-objekte" class="page">
-      <div id="objekte-list"></div>
-    </div>
-
-    <!-- ══ MIETER ══ -->
-    <div id="page-mieter" class="page">
-      <div id="mieter-list"></div>
-    </div>
-
-    <!-- ══ MIETEINGANG ══ -->
-    <div id="page-mieteingang" class="page">
-      <div id="mieteingang-content"></div>
-    </div>
-
-    <!-- ══ KOSTEN ══ -->
-    <div id="page-kosten" class="page">
-      <div id="kosten-content"></div>
-    </div>
-
-    <!-- ══ VERTRÄGE ══ -->
-    <div id="page-vertraege" class="page">
-      <div id="vertraege-content"></div>
-    </div>
-
-    <!-- ══ AUFGABEN ══ -->
-    <div id="page-aufgaben" class="page">
-      <div id="aufgaben-content"></div>
-    </div>
-
-    <!-- ══ KALENDER ══ -->
-    <div id="page-kalender" class="page">
-      <div id="kalender-content"></div>
-    </div>
-
+    <div id="page-objekte" class="page"><div id="objekte-list"></div></div>
+    <div id="page-mieter" class="page"><div id="mieter-list"></div></div>
+    <div id="page-mieteingang" class="page"><div id="mieteingang-content"></div></div>
+    <div id="page-kosten" class="page"><div id="kosten-content"></div></div>
+    <div id="page-vertraege" class="page"><div id="vertraege-content"></div></div>
+    <div id="page-aufgaben" class="page"><div id="aufgaben-content"></div></div>
+    <div id="page-kalender" class="page"><div id="kalender-content"></div></div>
   </div>
 </div>
-
-<!-- ═══ MODALS ═══ -->
-<!-- Objekt Modal -->
 <div class="modal-overlay" id="modal-objekt">
   <div class="modal">
-    <div class="modal-header">
-      <h3 id="modal-objekt-title">Objekt hinzufügen</h3>
-      <button class="modal-close" onclick="closeModal('modal-objekt')">✕</button>
-    </div>
+    <div class="modal-header"><h3 id="modal-objekt-title">Objekt hinzufuegen</h3><button class="modal-close" onclick="closeModal('modal-objekt')">X</button></div>
     <div class="modal-body">
       <input type="hidden" id="objekt-edit-id">
       <div class="form-row">
-        <div class="form-group"><label>Bezeichnung *</label><input type="text" id="obj-name" placeholder="z.B. Haus Musterstraße 5"></div>
-        <div class="form-group"><label>Typ</label>
-          <select id="obj-typ"><option>Haus</option><option>Wohnung</option><option>Gewerbe</option></select>
-        </div>
+        <div class="form-group"><label>Bezeichnung</label><input type="text" id="obj-name" placeholder="z.B. Haus Musterstrasse 5"></div>
+        <div class="form-group"><label>Typ</label><select id="obj-typ"><option>Haus</option><option>Wohnung</option><option>Gewerbe</option></select></div>
       </div>
-      <div class="form-group"><label>Adresse *</label><input type="text" id="obj-adresse" placeholder="Straße, Hausnummer, PLZ Ort"></div>
+      <div class="form-group"><label>Adresse</label><input type="text" id="obj-adresse"></div>
       <div class="form-row-3">
-        <div class="form-group"><label>Wohnfläche (m²)</label><input type="number" id="obj-flaeche" placeholder="0"></div>
-        <div class="form-group"><label>Zimmer</label><input type="number" id="obj-zimmer" placeholder="0"></div>
-        <div class="form-group"><label>Baujahr</label><input type="number" id="obj-baujahr" placeholder="z.B. 1990"></div>
+        <div class="form-group"><label>Flaeche m2</label><input type="number" id="obj-flaeche"></div>
+        <div class="form-group"><label>Zimmer</label><input type="number" id="obj-zimmer"></div>
+        <div class="form-group"><label>Baujahr</label><input type="number" id="obj-baujahr"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Kaltmiete (€/Monat)</label><input type="number" id="obj-kaltmiete" placeholder="0"></div>
-        <div class="form-group"><label>Nebenkosten (€/Monat)</label><input type="number" id="obj-nk" placeholder="0"></div>
+        <div class="form-group"><label>Kaltmiete Euro</label><input type="number" id="obj-kaltmiete"></div>
+        <div class="form-group"><label>Nebenkosten Euro</label><input type="number" id="obj-nk"></div>
       </div>
-      <div class="form-group"><label>Status</label>
-        <select id="obj-status"><option value="vermietet">Vermietet</option><option value="leer">Leerstand</option><option value="sanierung">In Sanierung</option></select>
-      </div>
-      <div class="form-group"><label>Notizen</label><textarea id="obj-notizen" rows="3" placeholder="Besonderheiten, Ausstattung..."></textarea></div>
+      <div class="form-group"><label>Status</label><select id="obj-status"><option value="vermietet">Vermietet</option><option value="leer">Leerstand</option><option value="sanierung">In Sanierung</option></select></div>
+      <div class="form-group"><label>Notizen</label><textarea id="obj-notizen" rows="3"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-objekt')">Abbrechen</button>
-      <button class="btn btn-primary" onclick="saveObjekt()">💾 Speichern</button>
+      <button class="btn btn-primary" onclick="saveObjekt()">Speichern</button>
     </div>
   </div>
 </div>
-
-<!-- Mieter Modal -->
 <div class="modal-overlay" id="modal-mieter">
   <div class="modal">
-    <div class="modal-header">
-      <h3 id="modal-mieter-title">Mieter hinzufügen</h3>
-      <button class="modal-close" onclick="closeModal('modal-mieter')">✕</button>
-    </div>
+    <div class="modal-header"><h3 id="modal-mieter-title">Mieter hinzufuegen</h3><button class="modal-close" onclick="closeModal('modal-mieter')">X</button></div>
     <div class="modal-body">
       <input type="hidden" id="mieter-edit-id">
       <div class="form-row">
-        <div class="form-group"><label>Vorname *</label><input type="text" id="m-vorname" placeholder="Vorname"></div>
-        <div class="form-group"><label>Nachname *</label><input type="text" id="m-nachname" placeholder="Nachname"></div>
+        <div class="form-group"><label>Vorname</label><input type="text" id="m-vorname"></div>
+        <div class="form-group"><label>Nachname</label><input type="text" id="m-nachname"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Telefon</label><input type="text" id="m-telefon" placeholder="+49 ..."></div>
-        <div class="form-group"><label>E-Mail</label><input type="email" id="m-email" placeholder="email@beispiel.de"></div>
+        <div class="form-group"><label>Telefon</label><input type="text" id="m-telefon"></div>
+        <div class="form-group"><label>E-Mail</label><input type="email" id="m-email"></div>
       </div>
-      <div class="form-group"><label>Objekt</label>
-        <select id="m-objekt"><option value="">— Objekt wählen —</option></select>
-      </div>
+      <div class="form-group"><label>Objekt</label><select id="m-objekt"><option value="">Objekt waehlen</option></select></div>
       <div class="form-row">
         <div class="form-group"><label>Mietbeginn</label><input type="date" id="m-beginn"></div>
-        <div class="form-group"><label>Mietende (leer = unbefristet)</label><input type="date" id="m-ende"></div>
+        <div class="form-group"><label>Mietende</label><input type="date" id="m-ende"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Kaltmiete (€)</label><input type="number" id="m-miete" placeholder="0"></div>
-        <div class="form-group"><label>Nebenkosten (€)</label><input type="number" id="m-nk" placeholder="0"></div>
+        <div class="form-group"><label>Kaltmiete Euro</label><input type="number" id="m-miete"></div>
+        <div class="form-group"><label>Nebenkosten Euro</label><input type="number" id="m-nk"></div>
       </div>
-      <div class="form-group"><label>Kaution (€)</label><input type="number" id="m-kaution" placeholder="0"></div>
+      <div class="form-group"><label>Kaution Euro</label><input type="number" id="m-kaution"></div>
       <div class="form-group"><label>Notizen</label><textarea id="m-notizen" rows="2"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-mieter')">Abbrechen</button>
-      <button class="btn btn-primary" onclick="saveMieter()">💾 Speichern</button>
+      <button class="btn btn-primary" onclick="saveMieter()">Speichern</button>
     </div>
   </div>
 </div>
-
-<!-- Mieteingang Modal -->
 <div class="modal-overlay" id="modal-mieteingang">
   <div class="modal" style="width:480px">
-    <div class="modal-header">
-      <h3>Mietzahlung erfassen</h3>
-      <button class="modal-close" onclick="closeModal('modal-mieteingang')">✕</button>
-    </div>
+    <div class="modal-header"><h3>Mietzahlung erfassen</h3><button class="modal-close" onclick="closeModal('modal-mieteingang')">X</button></div>
     <div class="modal-body">
       <input type="hidden" id="me-edit-id">
-      <div class="form-group"><label>Mieter</label>
-        <select id="me-mieter"><option value="">— Mieter wählen —</option></select>
-      </div>
+      <div class="form-group"><label>Mieter</label><select id="me-mieter"><option value="">Mieter waehlen</option></select></div>
       <div class="form-row">
-        <div class="form-group"><label>Monat/Jahr</label><input type="month" id="me-monat"></div>
-        <div class="form-group"><label>Betrag (€)</label><input type="number" id="me-betrag" placeholder="0"></div>
+        <div class="form-group"><label>Monat</label><input type="month" id="me-monat"></div>
+        <div class="form-group"><label>Betrag Euro</label><input type="number" id="me-betrag"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>Eingangsdatum</label><input type="date" id="me-datum"></div>
-        <div class="form-group"><label>Status</label>
-          <select id="me-status">
-            <option value="bezahlt">Bezahlt</option>
-            <option value="ausstehend">Ausstehend</option>
-            <option value="teilzahlung">Teilzahlung</option>
-          </select>
-        </div>
+        <div class="form-group"><label>Status</label><select id="me-status"><option value="bezahlt">Bezahlt</option><option value="ausstehend">Ausstehend</option><option value="teilzahlung">Teilzahlung</option></select></div>
       </div>
-      <div class="form-group"><label>Notiz</label><input type="text" id="me-notiz" placeholder="Optional"></div>
+      <div class="form-group"><label>Notiz</label><input type="text" id="me-notiz"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-mieteingang')">Abbrechen</button>
-      <button class="btn btn-primary" onclick="saveMieteingang()">💾 Speichern</button>
+      <button class="btn btn-primary" onclick="saveMieteingang()">Speichern</button>
     </div>
   </div>
 </div>
-
-<!-- Kosten Modal -->
 <div class="modal-overlay" id="modal-kosten">
   <div class="modal" style="width:480px">
-    <div class="modal-header">
-      <h3>Ausgabe erfassen</h3>
-      <button class="modal-close" onclick="closeModal('modal-kosten')">✕</button>
-    </div>
+    <div class="modal-header"><h3>Ausgabe erfassen</h3><button class="modal-close" onclick="closeModal('modal-kosten')">X</button></div>
     <div class="modal-body">
       <input type="hidden" id="k-edit-id">
-      <div class="form-group"><label>Bezeichnung *</label><input type="text" id="k-name" placeholder="z.B. Heizungswartung"></div>
+      <div class="form-group"><label>Bezeichnung</label><input type="text" id="k-name"></div>
       <div class="form-row">
-        <div class="form-group"><label>Betrag (€)</label><input type="number" id="k-betrag" placeholder="0"></div>
+        <div class="form-group"><label>Betrag Euro</label><input type="number" id="k-betrag"></div>
         <div class="form-group"><label>Datum</label><input type="date" id="k-datum"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Kategorie</label>
-          <select id="k-kategorie">
-            <option>Reparatur</option><option>Instandhaltung</option><option>Versicherung</option>
-            <option>Verwaltung</option><option>Steuer</option><option>Nebenkosten</option><option>Sonstiges</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Objekt</label>
-          <select id="k-objekt"><option value="">— Alle / Allgemein —</option></select>
-        </div>
+        <div class="form-group"><label>Kategorie</label><select id="k-kategorie"><option>Reparatur</option><option>Instandhaltung</option><option>Versicherung</option><option>Verwaltung</option><option>Steuer</option><option>Nebenkosten</option><option>Sonstiges</option></select></div>
+        <div class="form-group"><label>Objekt</label><select id="k-objekt"><option value="">Allgemein</option></select></div>
       </div>
       <div class="form-group"><label>Notiz</label><textarea id="k-notiz" rows="2"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-kosten')">Abbrechen</button>
-      <button class="btn btn-primary" onclick="saveKosten()">💾 Speichern</button>
+      <button class="btn btn-primary" onclick="saveKosten()">Speichern</button>
     </div>
   </div>
 </div>
-
-<!-- Vertrag Modal -->
 <div class="modal-overlay" id="modal-vertrag">
   <div class="modal">
-    <div class="modal-header">
-      <h3>Dokument / Vertrag erfassen</h3>
-      <button class="modal-close" onclick="closeModal('modal-vertrag')">✕</button>
-    </div>
+    <div class="modal-header"><h3>Dokument erfassen</h3><button class="modal-close" onclick="closeModal('modal-vertrag')">X</button></div>
     <div class="modal-body">
       <input type="hidden" id="v-edit-id">
-      <div class="form-group"><label>Bezeichnung *</label><input type="text" id="v-name" placeholder="z.B. Mietvertrag Müller 2024"></div>
+      <div class="form-group"><label>Bezeichnung</label><input type="text" id="v-name"></div>
       <div class="form-row">
-        <div class="form-group"><label>Typ</label>
-          <select id="v-typ">
-            <option>Mietvertrag</option><option>Übergabeprotokoll</option><option>Versicherungspolice</option>
-            <option>Nebenkostenabrechnung</option><option>Handwerkerrechnung</option><option>Sonstiges</option>
-          </select>
-        </div>
+        <div class="form-group"><label>Typ</label><select id="v-typ"><option>Mietvertrag</option><option>Uebergabeprotokoll</option><option>Versicherungspolice</option><option>Nebenkostenabrechnung</option><option>Handwerkerrechnung</option><option>Sonstiges</option></select></div>
         <div class="form-group"><label>Datum</label><input type="date" id="v-datum"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Objekt</label>
-          <select id="v-objekt"><option value="">— Allgemein —</option></select>
-        </div>
-        <div class="form-group"><label>Mieter</label>
-          <select id="v-mieter"><option value="">— Kein Bezug —</option></select>
-        </div>
+        <div class="form-group"><label>Objekt</label><select id="v-objekt"><option value="">Allgemein</option></select></div>
+        <div class="form-group"><label>Mieter</label><select id="v-mieter"><option value="">Kein Bezug</option></select></div>
       </div>
-      <div class="form-group"><label>Frist / Ablaufdatum (optional)</label><input type="date" id="v-frist"></div>
+      <div class="form-group"><label>Frist</label><input type="date" id="v-frist"></div>
       <div class="form-group"><label>Notizen</label><textarea id="v-notiz" rows="3"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-vertrag')">Abbrechen</button>
-      <button class="btn btn-primary" onclick="saveVertrag()">💾 Speichern</button>
+      <button class="btn btn-primary" onclick="saveVertrag()">Speichern</button>
     </div>
   </div>
 </div>
-
-<!-- Aufgabe Modal -->
 <div class="modal-overlay" id="modal-aufgabe">
   <div class="modal" style="width:460px">
-    <div class="modal-header">
-      <h3>Aufgabe erfassen</h3>
-      <button class="modal-close" onclick="closeModal('modal-aufgabe')">✕</button>
-    </div>
+    <div class="modal-header"><h3>Aufgabe erfassen</h3><button class="modal-close" onclick="closeModal('modal-aufgabe')">X</button></div>
     <div class="modal-body">
       <input type="hidden" id="a-edit-id">
-      <div class="form-group"><label>Aufgabe *</label><input type="text" id="a-titel" placeholder="Was muss erledigt werden?"></div>
+      <div class="form-group"><label>Aufgabe</label><input type="text" id="a-titel"></div>
       <div class="form-row">
-        <div class="form-group"><label>Fällig am</label><input type="date" id="a-faellig"></div>
-        <div class="form-group"><label>Priorität</label>
-          <select id="a-prio"><option value="hoch">🔴 Hoch</option><option value="mittel" selected>🟡 Mittel</option><option value="niedrig">🟢 Niedrig</option></select>
-        </div>
+        <div class="form-group"><label>Faellig am</label><input type="date" id="a-faellig"></div>
+        <div class="form-group"><label>Prioritaet</label><select id="a-prio"><option value="hoch">Hoch</option><option value="mittel" selected>Mittel</option><option value="niedrig">Niedrig</option></select></div>
       </div>
-      <div class="form-group"><label>Objekt</label>
-        <select id="a-objekt"><option value="">— Kein Bezug —</option></select>
-      </div>
+      <div class="form-group"><label>Objekt</label><select id="a-objekt"><option value="">Kein Bezug</option></select></div>
       <div class="form-group"><label>Notiz</label><textarea id="a-notiz" rows="2"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-aufgabe')">Abbrechen</button>
-      <button class="btn btn-primary" onclick="saveAufgabe()">💾 Speichern</button>
+      <button class="btn btn-primary" onclick="saveAufgabe()">Speichern</button>
     </div>
   </div>
-</div>
+</div><script>
+var objekte=JSON.parse(localStorage.getItem('objekte')||'[]');
+var mieter=JSON.parse(localStorage.getItem('mieter')||'[]');
+var mieteingang=JSON.parse(localStorage.getItem('mieteingang')||'[]');
+var kosten=JSON.parse(localStorage.getItem('kosten')||'[]');
+var vertraege=JSON.parse(localStorage.getItem('vertraege')||'[]');
+var aufgaben=JSON.parse(localStorage.getItem('aufgaben')||'[]');
 
-<script>
-// ═══════════════════════════════════════════════════
-// DATENSPEICHERUNG (localStorage)
-// ═══════════════════════════════════════════════════
-const DB = {
-  load(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } },
-  save(key, data) { localStorage.setItem(key, JSON.stringify(data)); },
-  id() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-};
-
-let objekte     = DB.load('objekte');
-let mieter      = DB.load('mieter');
-let mieteingang = DB.load('mieteingang');
-let kosten      = DB.load('kosten');
-let vertraege   = DB.load('vertraege');
-let aufgaben    = DB.load('aufgaben');
-
-function persist() {
-  DB.save('objekte', objekte);
-  DB.save('mieter', mieter);
-  DB.save('mieteingang', mieteingang);
-  DB.save('kosten', kosten);
-  DB.save('vertraege', vertraege);
-  DB.save('aufgaben', aufgaben);
+function persist(){
+  localStorage.setItem('objekte',JSON.stringify(objekte));
+  localStorage.setItem('mieter',JSON.stringify(mieter));
+  localStorage.setItem('mieteingang',JSON.stringify(mieteingang));
+  localStorage.setItem('kosten',JSON.stringify(kosten));
+  localStorage.setItem('vertraege',JSON.stringify(vertraege));
+  localStorage.setItem('aufgaben',JSON.stringify(aufgaben));
 }
 
-// ═══════════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════════
-const pageTitles = {
-  dashboard:    ['Dashboard', 'Ihr Überblick auf einen Blick'],
-  objekte:      ['Objekte', 'Alle Häuser & Wohnungen'],
-  mieter:       ['Mieter', 'Alle aktuellen & früheren Mieter'],
-  mieteingang:  ['Mieteingang', 'Monatliche Mietübersicht'],
-  kosten:       ['Kosten & Ausgaben', 'Reparaturen, Versicherungen und mehr'],
-  vertraege:    ['Verträge & Dokumente', 'Wichtige Unterlagen und Fristen'],
-  aufgaben:     ['Aufgaben', 'To-Do Liste'],
-  kalender:     ['Kalender', 'Termine und Fristen im Überblick'],
-};
+function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function fmtE(n){return Number(n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});}
+function fmtD(d){if(!d)return '-';return new Date(d).toLocaleDateString('de-DE');}
+function today(){return new Date().toISOString().split('T')[0];}
+function thisMonth(){return new Date().toISOString().slice(0,7);}
 
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('nav-' + page).classList.add('active');
-  const [title, sub] = pageTitles[page];
-  document.getElementById('page-title').textContent = title;
-  document.getElementById('page-sub').textContent = sub;
-  renderPage(page);
+function showPage(page){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('nav a').forEach(function(a){a.classList.remove('active');});
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('nav-'+page).classList.add('active');
+  var titles={dashboard:'Dashboard',objekte:'Objekte',mieter:'Mieter',mieteingang:'Mieteingang',kosten:'Kosten',vertraege:'Vertraege',aufgaben:'Aufgaben',kalender:'Kalender'};
+  document.getElementById('page-title').textContent=titles[page];
+  var btns={objekte:'<button class="btn btn-primary" onclick="openObjektModal()">+ Objekt</button>',
+    mieter:'<button class="btn btn-primary" onclick="openMieterModal()">+ Mieter</button>',
+    mieteingang:'<button class="btn btn-primary" onclick="openMieteingangModal()">+ Zahlung</button>',
+    kosten:'<button class="btn btn-primary" onclick="openKostenModal()">+ Ausgabe</button>',
+    vertraege:'<button class="btn btn-primary" onclick="openVertragModal()">+ Dokument</button>',
+    aufgaben:'<button class="btn btn-primary" onclick="openAufgabeModal()">+ Aufgabe</button>'};
+  document.getElementById('topbar-actions').innerHTML=btns[page]||'';
+  var renders={dashboard:renderDashboard,objekte:renderObjekte,mieter:renderMieter,mieteingang:renderMieteingang,kosten:renderKosten,vertraege:renderVertraege,aufgaben:renderAufgaben,kalender:renderKalender};
+  if(renders[page])renders[page]();
 }
 
-function renderPage(page) {
-  const renders = {
-    dashboard:   renderDashboard,
-    objekte:     renderObjekte,
-    mieter:      renderMieter,
-    mieteingang: renderMieteingang,
-    kosten:      renderKosten,
-    vertraege:   renderVertraege,
-    aufgaben:    renderAufgaben,
-    kalender:    renderKalender,
-  };
-  const actions = {
-    objekte:     `<button class="btn btn-primary" onclick="openObjektModal()">＋ Objekt hinzufügen</button>`,
-    mieter:      `<button class="btn btn-primary" onclick="openMieterModal()">＋ Mieter hinzufügen</button>`,
-    mieteingang: `<button class="btn btn-primary" onclick="openMieteingangModal()">＋ Zahlung erfassen</button>`,
-    kosten:      `<button class="btn btn-primary" onclick="openKostenModal()">＋ Ausgabe erfassen</button>`,
-    vertraege:   `<button class="btn btn-primary" onclick="openVertragModal()">＋ Dokument erfassen</button>`,
-    aufgaben:    `<button class="btn btn-primary" onclick="openAufgabeModal()">＋ Aufgabe hinzufügen</button>`,
-  };
-  document.getElementById('topbar-actions').innerHTML = actions[page] || '';
-  if (renders[page]) renders[page]();
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+window.addEventListener('click',function(e){if(e.target.classList.contains('modal-overlay'))e.target.classList.remove('open');});
+
+function fillSelect(id,items,valFn,labelFn,empty){
+  var sel=document.getElementById(id);if(!sel)return;
+  var curr=sel.value;
+  sel.innerHTML=empty?'<option value="">'+empty+'</option>':'';
+  items.forEach(function(i){var o=document.createElement('option');o.value=valFn(i);o.textContent=labelFn(i);sel.appendChild(o);});
+  sel.value=curr;
 }
 
-// ═══════════════════════════════════════════════════
-// MODAL HELPERS
-// ═══════════════════════════════════════════════════
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-window.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
-});
-
-function populateSelect(selectId, items, valFn, labelFn, addEmpty) {
-  const sel = document.getElementById(selectId);
-  if (!sel) return;
-  const curr = sel.value;
-  sel.innerHTML = addEmpty ? `<option value="">${addEmpty}</option>` : '';
-  items.forEach(i => {
-    const o = document.createElement('option');
-    o.value = valFn(i); o.textContent = labelFn(i);
-    sel.appendChild(o);
+function renderDashboard(){
+  var mon=thisMonth();
+  var aktM=mieter.filter(function(m){return !m.ende||m.ende>=mon+'-01';});
+  var soll=aktM.reduce(function(s,m){return s+(Number(m.miete)||0)+(Number(m.nk)||0);},0);
+  var bez=mieteingang.filter(function(e){return e.monat===mon&&e.status==='bezahlt';}).reduce(function(s,e){return s+Number(e.betrag||0);},0);
+  var kJahr=kosten.filter(function(k){return k.datum&&k.datum.startsWith(new Date().getFullYear()+'');}).reduce(function(s,k){return s+Number(k.betrag||0);},0);
+  var offA=aufgaben.filter(function(a){return a.status!=='erledigt';}).length;
+  document.getElementById('dash-stats').innerHTML=
+    '<div class="stat-card green"><div class="label">Mieteingang '+mon.slice(5)+'.'+mon.slice(0,4)+'</div><div class="value">'+fmtE(bez)+'</div><div class="note">Soll: '+fmtE(soll)+'</div></div>'+
+    '<div class="stat-card '+(soll-bez>0?'red':'green')+'"><div class="label">Ausstehend</div><div class="value">'+fmtE(Math.max(0,soll-bez))+'</div><div class="note">Diesen Monat</div></div>'+
+    '<div class="stat-card blue"><div class="label">Ausgaben '+new Date().getFullYear()+'</div><div class="value">'+fmtE(kJahr)+'</div><div class="note">Gesamtjahr</div></div>'+
+    '<div class="stat-card"><div class="label">Offene Aufgaben</div><div class="value">'+offA+'</div><div class="note">'+aufgaben.filter(function(a){return a.prio==='hoch'&&a.status!=='erledigt';}).length+' mit hoher Prioritaet</div></div>';
+  var mStatus=aktM.map(function(m){
+    var b=mieteingang.find(function(e){return e.mieterId===m.id&&e.monat===mon&&e.status==='bezahlt';});
+    var obj=objekte.find(function(o){return o.id===m.objektId;});
+    return {name:m.vorname+' '+m.nachname,bezahlt:!!b,obj:obj?obj.name:'-',betrag:Number(m.miete||0)+Number(m.nk||0)};
   });
-  sel.value = curr;
+  var offene=mStatus.filter(function(m){return !m.bezahlt;});
+  var offEl=document.getElementById('dash-offene-mieten');
+  if(offene.length===0){offEl.innerHTML='<div class="alert alert-success">Alle Mieter haben diesen Monat bezahlt!</div>';}
+  else{offEl.innerHTML='<table><thead><tr><th>Mieter</th><th>Objekt</th><th>Betrag</th></tr></thead><tbody>'+offene.map(function(m){return '<tr><td>'+m.name+'</td><td>'+m.obj+'</td><td>'+fmtE(m.betrag)+'</td></tr>';}).join('')+'</tbody></table>';}
+  var nextA=aufgaben.filter(function(a){return a.status!=='erledigt';}).sort(function(a,b){return (a.faellig||'9')>(b.faellig||'9')?1:-1;}).slice(0,5);
+  var aufEl=document.getElementById('dash-aufgaben');
+  if(nextA.length===0){aufEl.innerHTML='<div class="text-muted">Keine offenen Aufgaben</div>';}
+  else{aufEl.innerHTML=nextA.map(function(a){var ov=a.faellig&&a.faellig<today();return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>'+a.titel+'</span><span style="font-size:.78rem;color:'+(ov?'var(--warn)':'var(--muted)')+'">'+fmtD(a.faellig)+'</span></div>';}).join('');}
+  var objEl=document.getElementById('dash-objekte');
+  if(objekte.length===0){objEl.innerHTML='<div class="empty"><div class="icon">🏠</div><p>Noch keine Objekte. <a href="#" onclick="showPage(\'objekte\')" style="color:var(--accent)">Jetzt hinzufuegen</a></p></div>';}
+  else{objEl.innerHTML='<table><thead><tr><th>Objekt</th><th>Adresse</th><th>Status</th><th>Kaltmiete</th><th>Mieter</th></tr></thead><tbody>'+objekte.map(function(o){var m=mieter.find(function(m){return m.objektId===o.id;});var badge=o.status==='vermietet'?'badge-green':o.status==='leer'?'badge-red':'badge-gray';return '<tr><td class="bold">'+o.name+'</td><td>'+(o.adresse||'-')+'</td><td><span class="badge '+badge+'">'+o.status+'</span></td><td>'+fmtE(o.kaltmiete)+'</td><td>'+(m?m.vorname+' '+m.nachname:'-')+'</td></tr>';}).join('')+'</tbody></table>';}
 }
 
-function fmt€(n) { return Number(n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'}); }
-function fmtDate(d) { if(!d) return '–'; const dt=new Date(d); return dt.toLocaleDateString('de-DE'); }
-function today() { return new Date().toISOString().split('T')[0]; }
-function thisMonth() { return new Date().toISOString().slice(0,7); }
-
-// ═══════════════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════════════
-function renderDashboard() {
-  const monat = thisMonth();
-  const aktMieter = mieter.filter(m => !m.ende || m.ende >= monat+'-01');
-  const sollMiete = aktMieter.reduce((s,m) => s + (Number(m.miete)||0) + (Number(m.nk)||0), 0);
-  const bezahltBuchungen = mieteingang.filter(e => e.monat === monat && e.status === 'bezahlt');
-  const bezahltSum = bezahltBuchungen.reduce((s,e) => s + Number(e.betrag||0), 0);
-  const kostenJahr = kosten.filter(k => k.datum && k.datum.startsWith(new Date().getFullYear()+''))
-                          .reduce((s,k) => s + Number(k.betrag||0), 0);
-  const offeneAufgaben = aufgaben.filter(a => a.status !== 'erledigt').length;
-
-  document.getElementById('dash-stats').innerHTML = `
-    <div class="stat-card green"><div class="label">Mieteingang ${monat.slice(5)}.${monat.slice(0,4)}</div>
-      <div class="value">${fmt€(bezahltSum)}</div><div class="note">Soll: ${fmt€(sollMiete)}</div></div>
-    <div class="stat-card ${sollMiete - bezahltSum > 0 ? 'red':'green'}"><div class="label">Ausstehend</div>
-      <div class="value">${fmt€(Math.max(0, sollMiete - bezahltSum))}</div><div class="note">Diesen Monat</div></div>
-    <div class="stat-card blue"><div class="label">Ausgaben ${new Date().getFullYear()}</div>
-      <div class="value">${fmt€(kostenJahr)}</div><div class="note">Gesamtjahr</div></div>
-    <div class="stat-card"><div class="label">Offene Aufgaben</div>
-      <div class="value">${offeneAufgaben}</div><div class="note">${aufgaben.filter(a=>a.prio==='hoch'&&a.status!=='erledigt').length} mit hoher Priorität</div></div>
-  `;
-
-  // Offene Mieten
-  const mieterMitStatus = aktMieter.map(m => {
-    const b = mieteingang.find(e => e.mieterId === m.id && e.monat === monat && e.status === 'bezahlt');
-    const obj = objekte.find(o => o.id === m.objektId);
-    return { ...m, bezahlt: !!b, objName: obj?.name || '–' };
-  });
-  const offene = mieterMitStatus.filter(m => !m.bezahlt);
-  const offEl = document.getElementById('dash-offene-mieten');
-  if (offene.length === 0) {
-    offEl.innerHTML = `<div class="alert alert-success">✅ Alle Mieter haben diesen Monat bezahlt!</div>`;
-  } else {
-    offEl.innerHTML = `<table><thead><tr><th>Mieter</th><th>Objekt</th><th>Betrag</th></tr></thead><tbody>
-      ${offene.map(m=>`<tr><td>${m.vorname} ${m.nachname}</td><td>${m.objName}</td>
-        <td>${fmt€(Number(m.miete||0)+Number(m.nk||0))}</td></tr>`).join('')}
-    </tbody></table>`;
-  }
-
-  // Aufgaben
-  const nextAufgaben = aufgaben.filter(a=>a.status!=='erledigt').sort((a,b)=>(a.faellig||'9')>(b.faellig||'9')?1:-1).slice(0,5);
-  const aufEl = document.getElementById('dash-aufgaben');
-  if (nextAufgaben.length === 0) {
-    aufEl.innerHTML = `<div style="color:var(--muted);font-size:.9rem">Keine offenen Aufgaben 🎉</div>`;
-  } else {
-    aufEl.innerHTML = nextAufgaben.map(a => {
-      const overdue = a.faellig && a.faellig < today();
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
-        <div><span style="color:${a.prio==='hoch'?'var(--warn)':a.prio==='mittel'?'#B8860B':'var(--accent)'}">●</span>
-        &nbsp;${a.titel}</div>
-        <span style="font-size:.78rem;color:${overdue?'var(--warn)':'var(--muted)'}">${a.faellig?fmtDate(a.faellig):'–'}</span>
-      </div>`;
-    }).join('');
-  }
-
-  // Objekte
-  const objEl = document.getElementById('dash-objekte');
-  if (objekte.length === 0) {
-    objEl.innerHTML = `<div class="empty"><div class="icon">🏠</div><p>Noch keine Objekte angelegt. <a href="#" onclick="showPage('objekte')" style="color:var(--accent)">Jetzt hinzufügen →</a></p></div>`;
-  } else {
-    objEl.innerHTML = `<table><thead><tr><th>Objekt</th><th>Adresse</th><th>Typ</th><th>Status</th><th>Kaltmiete</th><th>Mieter</th></tr></thead><tbody>
-      ${objekte.map(o => {
-        const m = mieter.find(m => m.objektId === o.id && (!m.ende || m.ende >= today()));
-        const badge = o.status==='vermietet'?'badge-green':o.status==='leer'?'badge-red':'badge-gray';
-        return `<tr>
-          <td class="bold">${o.name}</td><td>${o.adresse||'–'}</td><td><span class="tag">${o.typ||'Haus'}</span></td>
-          <td><span class="badge ${badge}">${o.status}</span></td>
-          <td>${fmt€(o.kaltmiete)}</td>
-          <td>${m?m.vorname+' '+m.nachname:'<span class="text-muted">–</span>'}</td>
-        </tr>`;
-      }).join('')}
-    </tbody></table>`;
-  }
+function renderObjekte(){
+  var el=document.getElementById('objekte-list');
+  if(objekte.length===0){el.innerHTML='<div class="card"><div class="card-body"><div class="empty"><div class="icon">🏠</div><p>Noch keine Objekte vorhanden.</p></div></div></div>';return;}
+  el.innerHTML='<div class="card"><div class="card-body"><table><thead><tr><th>Name</th><th>Adresse</th><th>Typ</th><th>m2</th><th>Zimmer</th><th>Kaltmiete</th><th>Status</th><th>Mieter</th><th></th></tr></thead><tbody>'+objekte.map(function(o){var m=mieter.find(function(m){return m.objektId===o.id;});var badge=o.status==='vermietet'?'badge-green':o.status==='leer'?'badge-red':'badge-gray';return '<tr><td class="bold">'+o.name+'</td><td>'+(o.adresse||'-')+'</td><td><span class="tag">'+o.typ+'</span></td><td>'+(o.flaeche||'-')+'</td><td>'+(o.zimmer||'-')+'</td><td>'+fmtE(o.kaltmiete)+'</td><td><span class="badge '+badge+'">'+o.status+'</span></td><td>'+(m?m.vorname+' '+m.nachname:'-')+'</td><td><button class="btn btn-secondary btn-sm" onclick="editObjekt(\''+o.id+'\')">Bearbeiten</button> <button class="btn btn-secondary btn-sm" onclick="deleteItem(\'objekte\',\''+o.id+'\')">Loeschen</button></td></tr>';}).join('')+'</tbody></table></div></div>';
 }
 
-// ═══════════════════════════════════════════════════
-// OBJEKTE
-// ═══════════════════════════════════════════════════
-function renderObjekte() {
-  const el = document.getElementById('objekte-list');
-  if (objekte.length === 0) {
-    el.innerHTML = `<div class="card"><div class="card-body"><div class="empty"><div class="icon">🏠</div><p>Noch keine Objekte vorhanden.<br>Klicke auf "+ Objekt hinzufügen" um zu starten.</p></div></div></div>`;
-    return;
-  }
-  el.innerHTML = `<div class="card"><div class="card-body">
-    <table><thead><tr><th>Name</th><th>Adresse</th><th>Typ</th><th>m²</th><th>Zimmer</th><th>Kaltmiete</th><th>Status</th><th>Mieter</th><th></th></tr></thead><tbody>
-    ${objekte.map(o => {
-      const m = mieter.find(m => m.objektId === o.id && (!m.ende || m.ende >= today()));
-      const badge = o.status==='vermietet'?'badge-green':o.status==='leer'?'badge-red':'badge-gray';
-      return `<tr>
-        <td class="bold">${o.name}</td><td>${o.adresse||'–'}</td>
-        <td><span class="tag">${o.typ}</span></td>
-        <td>${o.flaeche||'–'}</td><td>${o.zimmer||'–'}</td>
-        <td>${fmt€(o.kaltmiete)}</td>
-        <td><span class="badge ${badge}">${o.status}</span></td>
-        <td>${m?m.vorname+' '+m.nachname:'–'}</td>
-        <td><button class="btn btn-secondary btn-sm" onclick="editObjekt('${o.id}')">✏️</button>
-            <button class="btn btn-secondary btn-sm" onclick="deleteItem('objekte','${o.id}','Objekt')" style="margin-left:4px">🗑️</button></td>
-      </tr>`;
-    }).join('')}
-    </tbody></table>
-  </div></div>`;
-}
-
-function openObjektModal(id) {
-  document.getElementById('objekt-edit-id').value = '';
-  document.getElementById('modal-objekt-title').textContent = 'Objekt hinzufügen';
-  ['obj-name','obj-adresse','obj-flaeche','obj-zimmer','obj-baujahr','obj-kaltmiete','obj-nk','obj-notizen'].forEach(i => document.getElementById(i).value = '');
-  document.getElementById('obj-typ').value = 'Haus';
-  document.getElementById('obj-status').value = 'vermietet';
+function openObjektModal(){
+  document.getElementById('objekt-edit-id').value='';
+  document.getElementById('modal-objekt-title').textContent='Objekt hinzufuegen';
+  ['obj-name','obj-adresse','obj-flaeche','obj-zimmer','obj-baujahr','obj-kaltmiete','obj-nk','obj-notizen'].forEach(function(i){document.getElementById(i).value='';});
+  document.getElementById('obj-typ').value='Haus';
+  document.getElementById('obj-status').value='vermietet';
   openModal('modal-objekt');
 }
 
-function editObjekt(id) {
-  const o = objekte.find(x => x.id === id); if (!o) return;
-  document.getElementById('objekt-edit-id').value = o.id;
-  document.getElementById('modal-objekt-title').textContent = 'Objekt bearbeiten';
-  document.getElementById('obj-name').value = o.name||'';
-  document.getElementById('obj-adresse').value = o.adresse||'';
-  document.getElementById('obj-typ').value = o.typ||'Haus';
-  document.getElementById('obj-flaeche').value = o.flaeche||'';
-  document.getElementById('obj-zimmer').value = o.zimmer||'';
-  document.getElementById('obj-baujahr').value = o.baujahr||'';
-  document.getElementById('obj-kaltmiete').value = o.kaltmiete||'';
-  document.getElementById('obj-nk').value = o.nk||'';
-  document.getElementById('obj-status').value = o.status||'vermietet';
-  document.getElementById('obj-notizen').value = o.notizen||'';
+function editObjekt(id){
+  var o=objekte.find(function(x){return x.id===id;});if(!o)return;
+  document.getElementById('objekt-edit-id').value=o.id;
+  document.getElementById('modal-objekt-title').textContent='Objekt bearbeiten';
+  document.getElementById('obj-name').value=o.name||'';
+  document.getElementById('obj-adresse').value=o.adresse||'';
+  document.getElementById('obj-typ').value=o.typ||'Haus';
+  document.getElementById('obj-flaeche').value=o.flaeche||'';
+  document.getElementById('obj-zimmer').value=o.zimmer||'';
+  document.getElementById('obj-baujahr').value=o.baujahr||'';
+  document.getElementById('obj-kaltmiete').value=o.kaltmiete||'';
+  document.getElementById('obj-nk').value=o.nk||'';
+  document.getElementById('obj-status').value=o.status||'vermietet';
+  document.getElementById('obj-notizen').value=o.notizen||'';
   openModal('modal-objekt');
 }
 
-function saveObjekt() {
-  const name = document.getElementById('obj-name').value.trim();
-  if (!name) { alert('Bitte eine Bezeichnung eingeben.'); return; }
-  const id = document.getElementById('objekt-edit-id').value;
-  const data = {
-    name, adresse: document.getElementById('obj-adresse').value,
-    typ: document.getElementById('obj-typ').value,
-    flaeche: document.getElementById('obj-flaeche').value,
-    zimmer: document.getElementById('obj-zimmer').value,
-    baujahr: document.getElementById('obj-baujahr').value,
-    kaltmiete: document.getElementById('obj-kaltmiete').value,
-    nk: document.getElementById('obj-nk').value,
-    status: document.getElementById('obj-status').value,
-    notizen: document.getElementById('obj-notizen').value,
-  };
-  if (id) { const i = objekte.findIndex(x=>x.id===id); objekte[i] = {...objekte[i],...data}; }
-  else { objekte.push({id: DB.id(), ...data}); }
-  persist(); closeModal('modal-objekt'); renderObjekte();
+function saveObjekt(){
+  var name=document.getElementById('obj-name').value.trim();
+  if(!name){alert('Bitte eine Bezeichnung eingeben.');return;}
+  var id=document.getElementById('objekt-edit-id').value;
+  var data={name:name,adresse:document.getElementById('obj-adresse').value,typ:document.getElementById('obj-typ').value,flaeche:document.getElementById('obj-flaeche').value,zimmer:document.getElementById('obj-zimmer').value,baujahr:document.getElementById('obj-baujahr').value,kaltmiete:document.getElementById('obj-kaltmiete').value,nk:document.getElementById('obj-nk').value,status:document.getElementById('obj-status').value,notizen:document.getElementById('obj-notizen').value};
+  if(id){var i=objekte.findIndex(function(x){return x.id===id;});objekte[i]=Object.assign({},objekte[i],data);}
+  else{objekte.push(Object.assign({id:newId()},data));}
+  persist();closeModal('modal-objekt');renderObjekte();
 }
 
-// ═══════════════════════════════════════════════════
-// MIETER
-// ═══════════════════════════════════════════════════
-function renderMieter() {
-  const el = document.getElementById('mieter-list');
-  if (mieter.length === 0) {
-    el.innerHTML = `<div class="card"><div class="card-body"><div class="empty"><div class="icon">👥</div><p>Noch keine Mieter angelegt.</p></div></div></div>`;
-    return;
-  }
-  el.innerHTML = `<div class="card"><div class="card-body">
-    <table><thead><tr><th>Name</th><th>Telefon</th><th>E-Mail</th><th>Objekt</th><th>Miete ges.</th><th>Mietbeginn</th><th>Kaution</th><th></th></tr></thead><tbody>
-    ${mieter.map(m => {
-      const obj = objekte.find(o => o.id === m.objektId);
-      return `<tr>
-        <td class="bold">${m.vorname} ${m.nachname}</td>
-        <td>${m.telefon||'–'}</td><td>${m.email||'–'}</td>
-        <td>${obj?obj.name:'–'}</td>
-        <td>${fmt€(Number(m.miete||0)+Number(m.nk||0))}</td>
-        <td>${fmtDate(m.beginn)}</td>
-        <td>${fmt€(m.kaution)}</td>
-        <td><button class="btn btn-secondary btn-sm" onclick="editMieter('${m.id}')">✏️</button>
-            <button class="btn btn-secondary btn-sm" onclick="deleteItem('mieter','${m.id}','Mieter')" style="margin-left:4px">🗑️</button></td>
-      </tr>`;
-    }).join('')}
-    </tbody></table>
-  </div></div>`;
+function renderMieter(){
+  var el=document.getElementById('mieter-list');
+  if(mieter.length===0){el.innerHTML='<div class="card"><div class="card-body"><div class="empty"><div class="icon">👥</div><p>Noch keine Mieter angelegt.</p></div></div></div>';return;}
+  el.innerHTML='<div class="card"><div class="card-body"><table><thead><tr><th>Name</th><th>Telefon</th><th>E-Mail</th><th>Objekt</th><th>Miete ges.</th><th>Mietbeginn</th><th>Kaution</th><th></th></tr></thead><tbody>'+mieter.map(function(m){var obj=objekte.find(function(o){return o.id===m.objektId;});return '<tr><td class="bold">'+m.vorname+' '+m.nachname+'</td><td>'+(m.telefon||'-')+'</td><td>'+(m.email||'-')+'</td><td>'+(obj?obj.name:'-')+'</td><td>'+fmtE(Number(m.miete||0)+Number(m.nk||0))+'</td><td>'+fmtD(m.beginn)+'</td><td>'+fmtE(m.kaution)+'</td><td><button class="btn btn-secondary btn-sm" onclick="editMieter(\''+m.id+'\')">Bearbeiten</button> <button class="btn btn-secondary btn-sm" onclick="deleteItem(\'mieter\',\''+m.id+'\')">Loeschen</button></td></tr>';}).join('')+'</tbody></table></div></div>';
 }
 
-function openMieterModal() {
-  document.getElementById('mieter-edit-id').value = '';
-  document.getElementById('modal-mieter-title').textContent = 'Mieter hinzufügen';
-  ['m-vorname','m-nachname','m-telefon','m-email','m-beginn','m-ende','m-miete','m-nk','m-kaution','m-notizen'].forEach(i => document.getElementById(i).value = '');
-  populateSelect('m-objekt', objekte, o=>o.id, o=>o.name, '— Objekt wählen —');
+function openMieterModal(){
+  document.getElementById('mieter-edit-id').value='';
+  document.getElementById('modal-mieter-title').textContent='Mieter hinzufuegen';
+  ['m-vorname','m-nachname','m-telefon','m-email','m-beginn','m-ende','m-miete','m-nk','m-kaution','m-notizen'].forEach(function(i){document.getElementById(i).value='';});
+  fillSelect('m-objekt',objekte,function(o){return o.id;},function(o){return o.name;},'Objekt waehlen');
   openModal('modal-mieter');
 }
 
-function editMieter(id) {
-  const m = mieter.find(x=>x.id===id); if(!m) return;
-  document.getElementById('mieter-edit-id').value = m.id;
-  document.getElementById('modal-mieter-title').textContent = 'Mieter bearbeiten';
-  document.getElementById('m-vorname').value = m.vorname||'';
-  document.getElementById('m-nachname').value = m.nachname||'';
-  document.getElementById('m-telefon').value = m.telefon||'';
-  document.getElementById('m-email').value = m.email||'';
-  document.getElementById('m-beginn').value = m.beginn||'';
-  document.getElementById('m-ende').value = m.ende||'';
-  document.getElementById('m-miete').value = m.miete||'';
-  document.getElementById('m-nk').value = m.nk||'';
-  document.getElementById('m-kaution').value = m.kaution||'';
-  document.getElementById('m-notizen').value = m.notizen||'';
-  populateSelect('m-objekt', objekte, o=>o.id, o=>o.name, '— Objekt wählen —');
-  document.getElementById('m-objekt').value = m.objektId||'';
+function editMieter(id){
+  var m=mieter.find(function(x){return x.id===id;});if(!m)return;
+  document.getElementById('mieter-edit-id').value=m.id;
+  document.getElementById('modal-mieter-title').textContent='Mieter bearbeiten';
+  document.getElementById('m-vorname').value=m.vorname||'';
+  document.getElementById('m-nachname').value=m.nachname||'';
+  document.getElementById('m-telefon').value=m.telefon||'';
+  document.getElementById('m-email').value=m.email||'';
+  document.getElementById('m-beginn').value=m.beginn||'';
+  document.getElementById('m-ende').value=m.ende||'';
+  document.getElementById('m-miete').value=m.miete||'';
+  document.getElementById('m-nk').value=m.nk||'';
+  document.getElementById('m-kaution').value=m.kaution||'';
+  document.getElementById('m-notizen').value=m.notizen||'';
+  fillSelect('m-objekt',objekte,function(o){return o.id;},function(o){return o.name;},'Objekt waehlen');
+  document.getElementById('m-objekt').value=m.objektId||'';
   openModal('modal-mieter');
 }
 
-function saveMieter() {
-  const vorname = document.getElementById('m-vorname').value.trim();
-  const nachname = document.getElementById('m-nachname').value.trim();
-  if (!vorname||!nachname) { alert('Bitte Vor- und Nachname eingeben.'); return; }
-  const id = document.getElementById('mieter-edit-id').value;
-  const data = {
-    vorname, nachname,
-    telefon: document.getElementById('m-telefon').value,
-    email: document.getElementById('m-email').value,
-    objektId: document.getElementById('m-objekt').value,
-    beginn: document.getElementById('m-beginn').value,
-    ende: document.getElementById('m-ende').value,
-    miete: document.getElementById('m-miete').value,
-    nk: document.getElementById('m-nk').value,
-    kaution: document.getElementById('m-kaution').value,
-    notizen: document.getElementById('m-notizen').value,
-  };
-  if (id) { const i = mieter.findIndex(x=>x.id===id); mieter[i]={...mieter[i],...data}; }
-  else { mieter.push({id:DB.id(),...data}); }
-  persist(); closeModal('modal-mieter'); renderMieter();
-}
-
-// ═══════════════════════════════════════════════════
-// MIETEINGANG
-// ═══════════════════════════════════════════════════
-function renderMieteingang() {
-  const monat = thisMonth();
-  const el = document.getElementById('mieteingang-content');
-
-  const monateSet = new Set(mieteingang.map(e=>e.monat));
-  monateSet.add(monat);
-  const monate = [...monateSet].sort().reverse();
-
-  let html = '';
-  monate.forEach(m => {
-    const buchungen = mieteingang.filter(e => e.monat === m);
-    const sum = buchungen.filter(e=>e.status==='bezahlt').reduce((s,e)=>s+Number(e.betrag||0),0);
-    html += `<div class="card" style="margin-bottom:18px">
-      <div class="card-header">
-        <h3>📅 ${m.slice(5)}.${m.slice(0,4)}</h3>
-        <span class="badge badge-green">Eingang: ${fmt€(sum)}</span>
-      </div><div class="card-body">`;
-    if (buchungen.length === 0) {
-      html += `<div class="text-muted">Keine Buchungen für diesen Monat.</div>`;
-    } else {
-      html += `<table><thead><tr><th>Mieter</th><th>Betrag</th><th>Eingangsdatum</th><th>Status</th><th>Notiz</th><th></th></tr></thead><tbody>
-        ${buchungen.map(e => {
-          const m2 = mieter.find(x=>x.id===e.mieterId);
-          const badge = e.status==='bezahlt'?'badge-green':e.status==='ausstehend'?'badge-red':'badge-blue';
-          return `<tr>
-            <td>${m2?m2.vorname+' '+m2.nachname:'–'}</td>
-            <td>${fmt€(e.betrag)}</td><td>${fmtDate(e.datum)}</td>
-            <td><span class="badge ${badge}">${e.status}</span></td>
-            <td>${e.notiz||'–'}</td>
-            <td><button class="btn btn-secondary btn-sm" onclick="editMieteingang('${e.id}')">✏️</button>
-                <button class="btn btn-secondary btn-sm" onclick="deleteItem('mieteingang','${e.id}','Buchung')" style="margin-left:4px">🗑️</button></td>
-          </tr>`;
-        }).join('')}
-      </tbody></table>`;
-    }
-    html += `</div></div>`;
+function saveMieter(){
+  var vn=document.getElementById('m-vorname').value.trim();
+  var nn=document.getElementById('m-nachname').value.trim();
+  if(!vn||!nn){alert('Bitte Vor- und Nachname eingeben.');return;}
+  var id=document.getElementById('mieter-edit-id').value;
+  var data={vorname:vn,nachname:nn,telefon:document.getElementById('m-telefon').value,email:document.getElementById('m-email').value,objektId:document.getElementById('m-objekt').value,beginn:document.getElementById('m-beginn').value,ende:document.getElementById('m-ende').value,miete:document.getElementById('m-miete').value,nk:document.getElementById('m-nk').value,kaution:document.getElementById('m-kaution').value,notizen:document.getElementById('m-notizen').value};
+  if(id){var i=mieter.findIndex(function(x){return x.id===id;});mieter[i]=Object.assign({},mieter[i],data);}
+  else{mieter.push(Object.assign({id:newId()},data));}
+  persist();closeModal('modal-mieter');renderMieter();
+}function renderMieteingang(){
+  var el=document.getElementById('mieteingang-content');
+  var mon=thisMonth();
+  var monSet={};mieteingang.forEach(function(e){monSet[e.monat]=1;});monSet[mon]=1;
+  var monate=Object.keys(monSet).sort().reverse();
+  var html='';
+  monate.forEach(function(m){
+    var b=mieteingang.filter(function(e){return e.monat===m;});
+    var sum=b.filter(function(e){return e.status==='bezahlt';}).reduce(function(s,e){return s+Number(e.betrag||0);},0);
+    html+='<div class="card" style="margin-bottom:18px"><div class="card-header"><h3>'+m.slice(5)+'.'+m.slice(0,4)+'</h3><span class="badge badge-green">'+fmtE(sum)+'</span></div><div class="card-body">';
+    if(b.length===0){html+='<div class="text-muted">Keine Buchungen.</div>';}
+    else{html+='<table><thead><tr><th>Mieter</th><th>Betrag</th><th>Datum</th><th>Status</th><th>Notiz</th><th></th></tr></thead><tbody>'+b.map(function(e){var m2=mieter.find(function(x){return x.id===e.mieterId;});var badge=e.status==='bezahlt'?'badge-green':e.status==='ausstehend'?'badge-red':'badge-blue';return '<tr><td>'+(m2?m2.vorname+' '+m2.nachname:'-')+'</td><td>'+fmtE(e.betrag)+'</td><td>'+fmtD(e.datum)+'</td><td><span class="badge '+badge+'">'+e.status+'</span></td><td>'+(e.notiz||'-')+'</td><td><button class="btn btn-secondary btn-sm" onclick="editMieteingang(\''+e.id+'\')">Bearbeiten</button> <button class="btn btn-secondary btn-sm" onclick="deleteItem(\'mieteingang\',\''+e.id+'\')">Loeschen</button></td></tr>';}).join('')+'</tbody></table>';}
+    html+='</div></div>';
   });
-  el.innerHTML = html;
+  el.innerHTML=html;
 }
 
-function openMieteingangModal() {
-  document.getElementById('me-edit-id').value = '';
-  document.getElementById('me-monat').value = thisMonth();
-  document.getElementById('me-datum').value = today();
-  document.getElementById('me-betrag').value = '';
-  document.getElementById('me-notiz').value = '';
-  document.getElementById('me-status').value = 'bezahlt';
-  populateSelect('me-mieter', mieter, m=>m.id, m=>m.vorname+' '+m.nachname, '— Mieter wählen —');
+function openMieteingangModal(){
+  document.getElementById('me-edit-id').value='';
+  document.getElementById('me-monat').value=thisMonth();
+  document.getElementById('me-datum').value=today();
+  document.getElementById('me-betrag').value='';
+  document.getElementById('me-notiz').value='';
+  document.getElementById('me-status').value='bezahlt';
+  fillSelect('me-mieter',mieter,function(m){return m.id;},function(m){return m.vorname+' '+m.nachname;},'Mieter waehlen');
   openModal('modal-mieteingang');
 }
 
-function editMieteingang(id) {
-  const e = mieteingang.find(x=>x.id===id); if(!e) return;
-  document.getElementById('me-edit-id').value = e.id;
-  document.getElementById('me-monat').value = e.monat||'';
-  document.getElementById('me-datum').value = e.datum||'';
-  document.getElementById('me-betrag').value = e.betrag||'';
-  document.getElementById('me-notiz').value = e.notiz||'';
-  document.getElementById('me-status').value = e.status||'bezahlt';
-  populateSelect('me-mieter', mieter, m=>m.id, m=>m.vorname+' '+m.nachname, '— Mieter wählen —');
-  document.getElementById('me-mieter').value = e.mieterId||'';
+function editMieteingang(id){
+  var e=mieteingang.find(function(x){return x.id===id;});if(!e)return;
+  document.getElementById('me-edit-id').value=e.id;
+  document.getElementById('me-monat').value=e.monat||'';
+  document.getElementById('me-datum').value=e.datum||'';
+  document.getElementById('me-betrag').value=e.betrag||'';
+  document.getElementById('me-notiz').value=e.notiz||'';
+  document.getElementById('me-status').value=e.status||'bezahlt';
+  fillSelect('me-mieter',mieter,function(m){return m.id;},function(m){return m.vorname+' '+m.nachname;},'Mieter waehlen');
+  document.getElementById('me-mieter').value=e.mieterId||'';
   openModal('modal-mieteingang');
 }
 
-function saveMieteingang() {
-  const mieterId = document.getElementById('me-mieter').value;
-  if (!mieterId) { alert('Bitte einen Mieter wählen.'); return; }
-  const id = document.getElementById('me-edit-id').value;
-  const data = {
-    mieterId,
-    monat: document.getElementById('me-monat').value,
-    betrag: document.getElementById('me-betrag').value,
-    datum: document.getElementById('me-datum').value,
-    status: document.getElementById('me-status').value,
-    notiz: document.getElementById('me-notiz').value,
-  };
-  if (id) { const i = mieteingang.findIndex(x=>x.id===id); mieteingang[i]={...mieteingang[i],...data}; }
-  else { mieteingang.push({id:DB.id(),...data}); }
-  persist(); closeModal('modal-mieteingang'); renderMieteingang();
+function saveMieteingang(){
+  var mid=document.getElementById('me-mieter').value;
+  if(!mid){alert('Bitte einen Mieter waehlen.');return;}
+  var id=document.getElementById('me-edit-id').value;
+  var data={mieterId:mid,monat:document.getElementById('me-monat').value,betrag:document.getElementById('me-betrag').value,datum:document.getElementById('me-datum').value,status:document.getElementById('me-status').value,notiz:document.getElementById('me-notiz').value};
+  if(id){var i=mieteingang.findIndex(function(x){return x.id===id;});mieteingang[i]=Object.assign({},mieteingang[i],data);}
+  else{mieteingang.push(Object.assign({id:newId()},data));}
+  persist();closeModal('modal-mieteingang');renderMieteingang();
 }
 
-// ═══════════════════════════════════════════════════
-// KOSTEN
-// ═══════════════════════════════════════════════════
-function renderKosten() {
-  const el = document.getElementById('kosten-content');
-  const sorted = [...kosten].sort((a,b)=>(b.datum||'')>(a.datum||'')?1:-1);
-  const total = kosten.reduce((s,k)=>s+Number(k.betrag||0),0);
-
-  let byKat = {};
-  kosten.forEach(k => { byKat[k.kategorie] = (byKat[k.kategorie]||0)+Number(k.betrag||0); });
-
-  el.innerHTML = `
-    <div class="grid-3" style="margin-bottom:18px">
-      <div class="stat-card red"><div class="label">Gesamt</div><div class="value">${fmt€(total)}</div><div class="note">Alle Ausgaben</div></div>
-      <div class="stat-card"><div class="label">Dieses Jahr</div><div class="value">${fmt€(kosten.filter(k=>k.datum&&k.datum.startsWith(new Date().getFullYear()+'')).reduce((s,k)=>s+Number(k.betrag||0),0))}</div></div>
-      <div class="stat-card"><div class="label">Einträge</div><div class="value">${kosten.length}</div></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><h3>Alle Ausgaben</h3></div>
-      <div class="card-body">
-      ${sorted.length===0?`<div class="empty"><div class="icon">🧾</div><p>Noch keine Ausgaben erfasst.</p></div>`:
-        `<table><thead><tr><th>Bezeichnung</th><th>Kategorie</th><th>Objekt</th><th>Datum</th><th>Betrag</th><th></th></tr></thead><tbody>
-        ${sorted.map(k => {
-          const obj = objekte.find(o=>o.id===k.objektId);
-          return `<tr>
-            <td class="bold">${k.name}</td>
-            <td><span class="tag">${k.kategorie}</span></td>
-            <td>${obj?obj.name:'–'}</td>
-            <td>${fmtDate(k.datum)}</td>
-            <td class="bold">${fmt€(k.betrag)}</td>
-            <td><button class="btn btn-secondary btn-sm" onclick="editKosten('${k.id}')">✏️</button>
-                <button class="btn btn-secondary btn-sm" onclick="deleteItem('kosten','${k.id}','Ausgabe')" style="margin-left:4px">🗑️</button></td>
-          </tr>`;
-        }).join('')}
-        </tbody></table>`}
-      </div>
-    </div>`;
+function renderKosten(){
+  var el=document.getElementById('kosten-content');
+  var sorted=kosten.slice().sort(function(a,b){return (b.datum||'')>(a.datum||'')?1:-1;});
+  var total=kosten.reduce(function(s,k){return s+Number(k.betrag||0);},0);
+  var jahr=kosten.filter(function(k){return k.datum&&k.datum.startsWith(new Date().getFullYear()+'');}).reduce(function(s,k){return s+Number(k.betrag||0);},0);
+  el.innerHTML='<div class="grid-3" style="margin-bottom:18px"><div class="stat-card red"><div class="label">Gesamt</div><div class="value">'+fmtE(total)+'</div></div><div class="stat-card"><div class="label">Dieses Jahr</div><div class="value">'+fmtE(jahr)+'</div></div><div class="stat-card"><div class="label">Eintraege</div><div class="value">'+kosten.length+'</div></div></div><div class="card"><div class="card-header"><h3>Alle Ausgaben</h3></div><div class="card-body">'+(sorted.length===0?'<div class="empty"><div class="icon">🧾</div><p>Noch keine Ausgaben.</p></div>':'<table><thead><tr><th>Bezeichnung</th><th>Kategorie</th><th>Objekt</th><th>Datum</th><th>Betrag</th><th></th></tr></thead><tbody>'+sorted.map(function(k){var obj=objekte.find(function(o){return o.id===k.objektId;});return '<tr><td class="bold">'+k.name+'</td><td><span class="tag">'+k.kategorie+'</span></td><td>'+(obj?obj.name:'-')+'</td><td>'+fmtD(k.datum)+'</td><td class="bold">'+fmtE(k.betrag)+'</td><td><button class="btn btn-secondary btn-sm" onclick="editKosten(\''+k.id+'\')">Bearbeiten</button> <button class="btn btn-secondary btn-sm" onclick="deleteItem(\'kosten\',\''+k.id+'\')">Loeschen</button></td></tr>';}).join('')+'</tbody></table>')+'</div></div>';
 }
 
-function openKostenModal() {
-  document.getElementById('k-edit-id').value = '';
-  document.getElementById('k-name').value = '';
-  document.getElementById('k-betrag').value = '';
-  document.getElementById('k-datum').value = today();
-  document.getElementById('k-notiz').value = '';
-  document.getElementById('k-kategorie').value = 'Reparatur';
-  populateSelect('k-objekt', objekte, o=>o.id, o=>o.name, '— Alle / Allgemein —');
+function openKostenModal(){
+  document.getElementById('k-edit-id').value='';
+  document.getElementById('k-name').value='';
+  document.getElementById('k-betrag').value='';
+  document.getElementById('k-datum').value=today();
+  document.getElementById('k-notiz').value='';
+  document.getElementById('k-kategorie').value='Reparatur';
+  fillSelect('k-objekt',objekte,function(o){return o.id;},function(o){return o.name;},'Allgemein');
   openModal('modal-kosten');
 }
 
-function editKosten(id) {
-  const k = kosten.find(x=>x.id===id); if(!k) return;
-  document.getElementById('k-edit-id').value = k.id;
-  document.getElementById('k-name').value = k.name||'';
-  document.getElementById('k-betrag').value = k.betrag||'';
-  document.getElementById('k-datum').value = k.datum||'';
-  document.getElementById('k-notiz').value = k.notiz||'';
-  document.getElementById('k-kategorie').value = k.kategorie||'Reparatur';
-  populateSelect('k-objekt', objekte, o=>o.id, o=>o.name, '— Alle / Allgemein —');
-  document.getElementById('k-objekt').value = k.objektId||'';
+function editKosten(id){
+  var k=kosten.find(function(x){return x.id===id;});if(!k)return;
+  document.getElementById('k-edit-id').value=k.id;
+  document.getElementById('k-name').value=k.name||'';
+  document.getElementById('k-betrag').value=k.betrag||'';
+  document.getElementById('k-datum').value=k.datum||'';
+  document.getElementById('k-notiz').value=k.notiz||'';
+  document.getElementById('k-kategorie').value=k.kategorie||'Reparatur';
+  fillSelect('k-objekt',objekte,function(o){return o.id;},function(o){return o.name;},'Allgemein');
+  document.getElementById('k-objekt').value=k.objektId||'';
   openModal('modal-kosten');
 }
 
-function saveKosten() {
-  const name = document.getElementById('k-name').value.trim();
-  if (!name) { alert('Bitte eine Bezeichnung eingeben.'); return; }
-  const id = document.getElementById('k-edit-id').value;
-  const data = {
-    name, betrag: document.getElementById('k-betrag').value,
-    datum: document.getElementById('k-datum').value,
-    kategorie: document.getElementById('k-kategorie').value,
-    objektId: document.getElementById('k-objekt').value,
-    notiz: document.getElementById('k-notiz').value,
-  };
-  if (id) { const i = kosten.findIndex(x=>x.id===id); kosten[i]={...kosten[i],...data}; }
-  else { kosten.push({id:DB.id(),...data}); }
-  persist(); closeModal('modal-kosten'); renderKosten();
+function saveKosten(){
+  var name=document.getElementById('k-name').value.trim();
+  if(!name){alert('Bitte eine Bezeichnung eingeben.');return;}
+  var id=document.getElementById('k-edit-id').value;
+  var data={name:name,betrag:document.getElementById('k-betrag').value,datum:document.getElementById('k-datum').value,kategorie:document.getElementById('k-kategorie').value,objektId:document.getElementById('k-objekt').value,notiz:document.getElementById('k-notiz').value};
+  if(id){var i=kosten.findIndex(function(x){return x.id===id;});kosten[i]=Object.assign({},kosten[i],data);}
+  else{kosten.push(Object.assign({id:newId()},data));}
+  persist();closeModal('modal-kosten');renderKosten();
 }
 
-// ═══════════════════════════════════════════════════
-// VERTRÄGE
-// ═══════════════════════════════════════════════════
-function renderVertraege() {
-  const el = document.getElementById('vertraege-content');
-  const sorted = [...vertraege].sort((a,b)=>(b.datum||'')>(a.datum||'')?1:-1);
-  const baldFaellig = vertraege.filter(v=>v.frist&&v.frist>=today()&&v.frist<=new Date(Date.now()+30*86400000).toISOString().split('T')[0]);
-
-  let html = '';
-  if (baldFaellig.length > 0) {
-    html += `<div class="alert alert-warning">⚠️ ${baldFaellig.length} Dokument(e) laufen in den nächsten 30 Tagen ab!</div>`;
-  }
-
-  html += `<div class="card">
-    <div class="card-header"><h3>Alle Dokumente & Verträge</h3></div>
-    <div class="card-body">
-    ${sorted.length===0?`<div class="empty"><div class="icon">📄</div><p>Noch keine Dokumente erfasst.</p></div>`:
-      `<table><thead><tr><th>Bezeichnung</th><th>Typ</th><th>Datum</th><th>Objekt</th><th>Mieter</th><th>Frist</th><th></th></tr></thead><tbody>
-      ${sorted.map(v => {
-        const obj = objekte.find(o=>o.id===v.objektId);
-        const m2 = mieter.find(m=>m.id===v.mieterId);
-        const abgelaufen = v.frist && v.frist < today();
-        const baldAbl = v.frist && v.frist >= today() && v.frist <= new Date(Date.now()+30*86400000).toISOString().split('T')[0];
-        return `<tr>
-          <td class="bold">${v.name}</td>
-          <td><span class="tag">${v.typ}</span></td>
-          <td>${fmtDate(v.datum)}</td>
-          <td>${obj?obj.name:'–'}</td>
-          <td>${m2?m2.vorname+' '+m2.nachname:'–'}</td>
-          <td>${v.frist?`<span style="color:${abgelaufen?'var(--warn)':baldAbl?'#B8860B':'inherit'}">${fmtDate(v.frist)}${abgelaufen?' ⚠️':''}</span>`:'–'}</td>
-          <td><button class="btn btn-secondary btn-sm" onclick="editVertrag('${v.id}')">✏️</button>
-              <button class="btn btn-secondary btn-sm" onclick="deleteItem('vertraege','${v.id}','Dokument')" style="margin-left:4px">🗑️</button></td>
-        </tr>`;
-      }).join('')}
-      </tbody></table>`}
-    </div></div>`;
-  el.innerHTML = html;
+function renderVertraege(){
+  var el=document.getElementById('vertraege-content');
+  var sorted=vertraege.slice().sort(function(a,b){return (b.datum||'')>(a.datum||'')?1:-1;});
+  var bald=vertraege.filter(function(v){return v.frist&&v.frist>=today()&&v.frist<=new Date(Date.now()+30*86400000).toISOString().split('T')[0];});
+  var html=bald.length>0?'<div class="alert alert-warning">'+bald.length+' Dokument(e) laufen in 30 Tagen ab!</div>':'';
+  html+='<div class="card"><div class="card-header"><h3>Alle Dokumente</h3></div><div class="card-body">'+(sorted.length===0?'<div class="empty"><div class="icon">📄</div><p>Noch keine Dokumente.</p></div>':'<table><thead><tr><th>Bezeichnung</th><th>Typ</th><th>Datum</th><th>Objekt</th><th>Mieter</th><th>Frist</th><th></th></tr></thead><tbody>'+sorted.map(function(v){var obj=objekte.find(function(o){return o.id===v.objektId;});var m2=mieter.find(function(m){return m.id===v.mieterId;});var abg=v.frist&&v.frist<today();return '<tr><td class="bold">'+v.name+'</td><td><span class="tag">'+v.typ+'</span></td><td>'+fmtD(v.datum)+'</td><td>'+(obj?obj.name:'-')+'</td><td>'+(m2?m2.vorname+' '+m2.nachname:'-')+'</td><td>'+(v.frist?'<span style="color:'+(abg?'var(--warn)':'inherit')+'">'+fmtD(v.frist)+(abg?' !':'')+'</span>':'-')+'</td><td><button class="btn btn-secondary btn-sm" onclick="editVertrag(\''+v.id+'\')">Bearbeiten</button> <button class="btn btn-secondary btn-sm" onclick="deleteItem(\'vertraege\',\''+v.id+'\')">Loeschen</button></td></tr>';}).join('')+'</tbody></table>')+'</div></div>';
+  el.innerHTML=html;
 }
 
-function openVertragModal() {
+function openVertragModal(){
   document.getElementById('v-edit-id').value='';
-  ['v-name','v-datum','v-frist','v-notiz'].forEach(i=>document.getElementById(i).value='');
-  document.getElementById('v-datum').value = today();
-  document.getElementById('v-typ').value = 'Mietvertrag';
-  populateSelect('v-objekt', objekte, o=>o.id, o=>o.name, '— Allgemein —');
-  populateSelect('v-mieter', mieter, m=>m.id, m=>m.vorname+' '+m.nachname, '— Kein Bezug —');
+  ['v-name','v-frist','v-notiz'].forEach(function(i){document.getElementById(i).value='';});
+  document.getElementById('v-datum').value=today();
+  document.getElementById('v-typ').value='Mietvertrag';
+  fillSelect('v-objekt',objekte,function(o){return o.id;},function(o){return o.name;},'Allgemein');
+  fillSelect('v-mieter',mieter,function(m){return m.id;},function(m){return m.vorname+' '+m.nachname;},'Kein Bezug');
   openModal('modal-vertrag');
 }
 
-function editVertrag(id) {
-  const v = vertraege.find(x=>x.id===id); if(!v) return;
+function editVertrag(id){
+  var v=vertraege.find(function(x){return x.id===id;});if(!v)return;
   document.getElementById('v-edit-id').value=v.id;
   document.getElementById('v-name').value=v.name||'';
   document.getElementById('v-typ').value=v.typ||'Mietvertrag';
   document.getElementById('v-datum').value=v.datum||'';
   document.getElementById('v-frist').value=v.frist||'';
   document.getElementById('v-notiz').value=v.notiz||'';
-  populateSelect('v-objekt', objekte, o=>o.id, o=>o.name, '— Allgemein —');
-  populateSelect('v-mieter', mieter, m=>m.id, m=>m.vorname+' '+m.nachname, '— Kein Bezug —');
+  fillSelect('v-objekt',objekte,function(o){return o.id;},function(o){return o.name;},'Allgemein');
+  fillSelect('v-mieter',mieter,function(m){return m.id;},function(m){return m.vorname+' '+m.nachname;},'Kein Bezug');
   document.getElementById('v-objekt').value=v.objektId||'';
   document.getElementById('v-mieter').value=v.mieterId||'';
   openModal('modal-vertrag');
 }
 
-function saveVertrag() {
-  const name=document.getElementById('v-name').value.trim();
+function saveVertrag(){
+  var name=document.getElementById('v-name').value.trim();
   if(!name){alert('Bitte eine Bezeichnung eingeben.');return;}
-  const id=document.getElementById('v-edit-id').value;
-  const data={name,typ:document.getElementById('v-typ').value,datum:document.getElementById('v-datum').value,
-    frist:document.getElementById('v-frist').value,objektId:document.getElementById('v-objekt').value,
-    mieterId:document.getElementById('v-mieter').value,notiz:document.getElementById('v-notiz').value};
-  if(id){const i=vertraege.findIndex(x=>x.id===id);vertraege[i]={...vertraege[i],...data};}
-  else{vertraege.push({id:DB.id(),...data});}
+  var id=document.getElementById('v-edit-id').value;
+  var data={name:name,typ:document.getElementById('v-typ').value,datum:document.getElementById('v-datum').value,frist:document.getElementById('v-frist').value,objektId:document.getElementById('v-objekt').value,mieterId:document.getElementById('v-mieter').value,notiz:document.getElementById('v-notiz').value};
+  if(id){var i=vertraege.findIndex(function(x){return x.id===id;});vertraege[i]=Object.assign({},vertraege[i],data);}
+  else{vertraege.push(Object.assign({id:newId()},data));}
   persist();closeModal('modal-vertrag');renderVertraege();
 }
 
-// ═══════════════════════════════════════════════════
-// AUFGABEN
-// ═══════════════════════════════════════════════════
-function renderAufgaben() {
-  const el = document.getElementById('aufgaben-content');
-  const offen = aufgaben.filter(a=>a.status!=='erledigt').sort((a,b)=>(a.faellig||'9')>(b.faellig||'9')?1:-1);
-  const erledigt = aufgaben.filter(a=>a.status==='erledigt');
-
-  const renderListe = (items, showCheck=true) => items.length===0?'<div class="text-muted" style="padding:12px 0">Keine Einträge.</div>':
-    items.map(a=>{
-      const obj=objekte.find(o=>o.id===a.objektId);
-      const overdue=a.faellig&&a.faellig<today()&&a.status!=='erledigt';
-      const prioColor=a.prio==='hoch'?'var(--warn)':a.prio==='mittel'?'#B8860B':'var(--accent)';
-      return `<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
-        ${showCheck?`<input type="checkbox" style="margin-top:3px;width:16px;height:16px;cursor:pointer" ${a.status==='erledigt'?'checked':''} onchange="toggleAufgabe('${a.id}')">`:
-        `<span style="font-size:1.1rem">✅</span>`}
-        <div style="flex:1">
-          <div style="font-weight:600;${a.status==='erledigt'?'text-decoration:line-through;color:var(--muted)':''}">${a.titel}</div>
-          <div style="font-size:.78rem;color:var(--muted);margin-top:3px">
-            <span style="color:${prioColor}">● ${a.prio}</span>
-            ${obj?` · ${obj.name}`:''}
-            ${a.faellig?` · <span style="color:${overdue?'var(--warn)':'inherit'}">${overdue?'⚠️ Überfällig: ':''}${fmtDate(a.faellig)}</span>`:''}
-          </div>
-          ${a.notiz?`<div style="font-size:.82rem;color:var(--muted);margin-top:4px">${a.notiz}</div>`:''}
-        </div>
-        <div style="display:flex;gap:4px">
-          ${showCheck?`<button class="btn btn-secondary btn-sm" onclick="editAufgabe('${a.id}')">✏️</button>`:''}
-          <button class="btn btn-secondary btn-sm" onclick="deleteItem('aufgaben','${a.id}','Aufgabe')">🗑️</button>
-        </div>
-      </div>`;
+function renderAufgaben(){
+  var el=document.getElementById('aufgaben-content');
+  var offen=aufgaben.filter(function(a){return a.status!=='erledigt';}).sort(function(a,b){return (a.faellig||'9')>(b.faellig||'9')?1:-1;});
+  var erledigt=aufgaben.filter(function(a){return a.status==='erledigt';});
+  function liste(items,check){
+    if(items.length===0)return '<div class="text-muted">Keine Eintraege.</div>';
+    return items.map(function(a){
+      var obj=objekte.find(function(o){return o.id===a.objektId;});
+      var ov=a.faellig&&a.faellig<today()&&a.status!=='erledigt';
+      var pc=a.prio==='hoch'?'var(--warn)':a.prio==='mittel'?'#B8860B':'var(--accent)';
+      return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">'+
+        (check?'<input type="checkbox" style="margin-top:3px;width:16px;height:16px;cursor:pointer" '+(a.status==='erledigt'?'checked':'')+' onchange="toggleAufgabe(\''+a.id+'\')">':'<span>✅</span>')+
+        '<div style="flex:1"><div style="font-weight:600;'+(a.status==='erledigt'?'text-decoration:line-through;color:var(--muted)':'')+'">'+a.titel+'</div>'+
+        '<div style="font-size:.78rem;color:var(--muted);margin-top:3px"><span style="color:'+pc+'">● '+a.prio+'</span>'+(obj?' · '+obj.name:'')+(a.faellig?' · <span style="color:'+(ov?'var(--warn)':'inherit')+'">'+(ov?'Ueberfaellig: ':'')+fmtD(a.faellig)+'</span>':'')+'</div>'+
+        (a.notiz?'<div style="font-size:.82rem;color:var(--muted);margin-top:4px">'+a.notiz+'</div>':'')+'</div>'+
+        '<div style="display:flex;gap:4px">'+(check?'<button class="btn btn-secondary btn-sm" onclick="editAufgabe(\''+a.id+'\')">Bearbeiten</button>':'')+
+        '<button class="btn btn-secondary btn-sm" onclick="deleteItem(\'aufgaben\',\''+a.id+'\')">Loeschen</button></div></div>';
     }).join('');
-
-  el.innerHTML = `
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-header"><h3>📋 Offene Aufgaben (${offen.length})</h3></div>
-        <div class="card-body">${renderListe(offen)}</div>
-      </div>
-      <div class="card">
-        <div class="card-header"><h3>✅ Erledigt (${erledigt.length})</h3></div>
-        <div class="card-body">${renderListe(erledigt, false)}</div>
-      </div>
-    </div>`;
+  }
+  el.innerHTML='<div class="grid-2"><div class="card"><div class="card-header"><h3>Offene Aufgaben ('+offen.length+')</h3></div><div class="card-body">'+liste(offen,true)+'</div></div><div class="card"><div class="card-header"><h3>Erledigt ('+erledigt.length+')</h3></div><div class="card-body">'+liste(erledigt,false)+'</div></div></div>';
 }
 
-function toggleAufgabe(id) {
-  const a=aufgaben.find(x=>x.id===id); if(!a) return;
+function toggleAufgabe(id){
+  var a=aufgaben.find(function(x){return x.id===id;});if(!a)return;
   a.status=a.status==='erledigt'?'offen':'erledigt';
-  persist(); renderAufgaben();
+  persist();renderAufgaben();
 }
 
-function openAufgabeModal() {
+function openAufgabeModal(){
   document.getElementById('a-edit-id').value='';
   document.getElementById('a-titel').value='';
   document.getElementById('a-faellig').value='';
   document.getElementById('a-notiz').value='';
   document.getElementById('a-prio').value='mittel';
-  populateSelect('a-objekt', objekte, o=>o.id, o=>o.name, '— Kein Bezug —');
+  fillSelect('a-objekt',objekte,function(o){return o.id;},function(o){return o.name;},'Kein Bezug');
   openModal('modal-aufgabe');
 }
 
-function editAufgabe(id) {
-  const a=aufgaben.find(x=>x.id===id); if(!a) return;
+function editAufgabe(id){
+  var a=aufgaben.find(function(x){return x.id===id;});if(!a)return;
   document.getElementById('a-edit-id').value=a.id;
   document.getElementById('a-titel').value=a.titel||'';
   document.getElementById('a-faellig').value=a.faellig||'';
   document.getElementById('a-notiz').value=a.notiz||'';
   document.getElementById('a-prio').value=a.prio||'mittel';
-  populateSelect('a-objekt', objekte, o=>o.id, o=>o.name, '— Kein Bezug —');
+  fillSelect('a-objekt',objekte,function(o){return o.id;},function(o){return o.name;},'Kein Bezug');
   document.getElementById('a-objekt').value=a.objektId||'';
   openModal('modal-aufgabe');
 }
 
-function saveAufgabe() {
-  const titel=document.getElementById('a-titel').value.trim();
+function saveAufgabe(){
+  var titel=document.getElementById('a-titel').value.trim();
   if(!titel){alert('Bitte eine Aufgabe eingeben.');return;}
-  const id=document.getElementById('a-edit-id').value;
-  const data={titel,faellig:document.getElementById('a-faellig').value,prio:document.getElementById('a-prio').value,
-    objektId:document.getElementById('a-objekt').value,notiz:document.getElementById('a-notiz').value,status:'offen'};
-  if(id){const i=aufgaben.findIndex(x=>x.id===id);aufgaben[i]={...aufgaben[i],...data};}
-  else{aufgaben.push({id:DB.id(),...data});}
+  var id=document.getElementById('a-edit-id').value;
+  var data={titel:titel,faellig:document.getElementById('a-faellig').value,prio:document.getElementById('a-prio').value,objektId:document.getElementById('a-objekt').value,notiz:document.getElementById('a-notiz').value,status:'offen'};
+  if(id){var i=aufgaben.findIndex(function(x){return x.id===id;});aufgaben[i]=Object.assign({},aufgaben[i],data);}
+  else{aufgaben.push(Object.assign({id:newId()},data));}
   persist();closeModal('modal-aufgabe');renderAufgaben();
 }
 
-// ═══════════════════════════════════════════════════
-// KALENDER
-// ═══════════════════════════════════════════════════
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
+var calYear=new Date().getFullYear();
+var calMonth=new Date().getMonth();
 
-function renderKalender() {
-  const el = document.getElementById('kalender-content');
-  const now = new Date();
-  const firstDay = new Date(calYear, calMonth, 1);
-  const lastDay = new Date(calYear, calMonth+1, 0);
-  const startDow = (firstDay.getDay()+6)%7; // Mo=0
-
-  const monthNames = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  const dayNames = ['Mo','Di','Mi','Do','Fr','Sa','So'];
-
-  // Events: Aufgaben & Vertragsfristen diesen Monat
-  const monthStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
-  const events = {};
-  aufgaben.filter(a=>a.faellig&&a.faellig.startsWith(monthStr)).forEach(a=>{
-    const d=parseInt(a.faellig.split('-')[2]); events[d]=(events[d]||[]).concat([{label:a.titel,color:'var(--warn)'}]);
-  });
-  vertraege.filter(v=>v.frist&&v.frist.startsWith(monthStr)).forEach(v=>{
-    const d=parseInt(v.frist.split('-')[2]); events[d]=(events[d]||[]).concat([{label:'Frist: '+v.name,color:'var(--info)'}]);
-  });
-
-  let cells='';
-  for(let i=0;i<startDow;i++) cells+=`<div class="cal-day other-month"></div>`;
-  for(let d=1;d<=lastDay.getDate();d++){
-    const isToday=d===now.getDate()&&calMonth===now.getMonth()&&calYear===now.getFullYear();
-    const ev=events[d]||[];
-    cells+=`<div class="cal-day${isToday?' today':''}" title="${ev.map(e=>e.label).join('\n')}">
-      ${d}${ev.length?`<div class="dot"></div>`:''}
-    </div>`;
+function renderKalender(){
+  var el=document.getElementById('kalender-content');
+  var now=new Date();
+  var lastDay=new Date(calYear,calMonth+1,0);
+  var startDow=(new Date(calYear,calMonth,1).getDay()+6)%7;
+  var mNames=['Januar','Februar','Maerz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  var dNames=['Mo','Di','Mi','Do','Fr','Sa','So'];
+  var monStr=calYear+'-'+String(calMonth+1).padStart(2,'0');
+  var events={};
+  aufgaben.filter(function(a){return a.faellig&&a.faellig.startsWith(monStr);}).forEach(function(a){var d=parseInt(a.faellig.split('-')[2]);events[d]=(events[d]||[]).concat([a.titel]);});
+  vertraege.filter(function(v){return v.frist&&v.frist.startsWith(monStr);}).forEach(function(v){var d=parseInt(v.frist.split('-')[2]);events[d]=(events[d]||[]).concat(['Frist: '+v.name]);});
+  var cells='';
+  for(var i=0;i<startDow;i++)cells+='<div class="cal-day other-month"></div>';
+  for(var d=1;d<=lastDay.getDate();d++){
+    var isToday=d===now.getDate()&&calMonth===now.getMonth()&&calYear===now.getFullYear();
+    var ev=events[d]||[];
+    cells+='<div class="cal-day'+(isToday?' today':'')+'" title="'+ev.join(', ')+'">'+d+(ev.length?'<div class="dot"></div>':'')+'</div>';
   }
-
-  // Liste der Events
-  const allEvents = [];
-  aufgaben.filter(a=>a.faellig&&a.faellig.startsWith(monthStr)&&a.status!=='erledigt').forEach(a=>{
-    allEvents.push({datum:a.faellig,label:'✅ '+a.titel,color:'var(--warn)'});
-  });
-  vertraege.filter(v=>v.frist&&v.frist.startsWith(monthStr)).forEach(v=>{
-    allEvents.push({datum:v.frist,label:'📄 Frist: '+v.name,color:'var(--info)'});
-  });
-  allEvents.sort((a,b)=>a.datum>b.datum?1:-1);
-
-  el.innerHTML = `<div class="grid-2">
-    <div class="card">
-      <div class="card-body">
-        <div class="cal-nav">
-          <button onclick="calNav(-1)">‹</button>
-          <strong style="font-family:Georgia,serif">${monthNames[calMonth]} ${calYear}</strong>
-          <button onclick="calNav(1)">›</button>
-        </div>
-        <div class="cal-grid">
-          ${dayNames.map(d=>`<div class="cal-day-name">${d}</div>`).join('')}
-          ${cells}
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><h3>Termine & Fristen im ${monthNames[calMonth]}</h3></div>
-      <div class="card-body">
-        ${allEvents.length===0?`<div class="text-muted">Keine Termine diesen Monat.</div>`:
-          allEvents.map(e=>`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-            <span style="color:${e.color};font-weight:700;min-width:80px">${fmtDate(e.datum)}</span>
-            <span>${e.label}</span>
-          </div>`).join('')}
-      </div>
-    </div>
-  </div>`;
+  var allEv=[];
+  aufgaben.filter(function(a){return a.faellig&&a.faellig.startsWith(monStr)&&a.status!=='erledigt';}).forEach(function(a){allEv.push({datum:a.faellig,label:'Aufgabe: '+a.titel});});
+  vertraege.filter(function(v){return v.frist&&v.frist.startsWith(monStr);}).forEach(function(v){allEv.push({datum:v.frist,label:'Frist: '+v.name});});
+  allEv.sort(function(a,b){return a.datum>b.datum?1:-1;});
+  el.innerHTML='<div class="grid-2"><div class="card"><div class="card-body"><div class="cal-nav"><button onclick="calNav(-1)">&#8249;</button><strong>'+mNames[calMonth]+' '+calYear+'</strong><button onclick="calNav(1)">&#8250;</button></div><div class="cal-grid">'+dNames.map(function(d){return '<div class="cal-day-name">'+d+'</div>';}).join('')+cells+'</div></div></div><div class="card"><div class="card-header"><h3>Termine im '+mNames[calMonth]+'</h3></div><div class="card-body">'+(allEv.length===0?'<div class="text-muted">Keine Termine.</div>':allEv.map(function(e){return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><span style="min-width:80px;color:var(--muted)">'+fmtD(e.datum)+'</span><span>'+e.label+'</span></div>';}).join(''))+'</div></div></div>';
 }
 
-function calNav(dir) {
+function calNav(dir){
   calMonth+=dir;
   if(calMonth<0){calMonth=11;calYear--;}
   if(calMonth>11){calMonth=0;calYear++;}
   renderKalender();
 }
 
-// ═══════════════════════════════════════════════════
-// LÖSCHEN
-// ═══════════════════════════════════════════════════
-const stores = { objekte, mieter, mieteingang, kosten, vertraege, aufgaben };
-function deleteItem(store, id, label) {
-  if (!confirm(`${label} wirklich löschen?`)) return;
-  const arr = { objekte, mieter, mieteingang, kosten, vertraege, aufgaben }[store];
-  const i = arr.findIndex(x=>x.id===id);
-  if(i>=0) arr.splice(i,1);
+function deleteItem(store,id){
+  if(!confirm('Wirklich loeschen?'))return;
+  var stores={objekte:objekte,mieter:mieter,mieteingang:mieteingang,kosten:kosten,vertraege:vertraege,aufgaben:aufgaben};
+  var arr=stores[store];
+  var i=arr.findIndex(function(x){return x.id===id;});
+  if(i>=0)arr.splice(i,1);
   persist();
-  const page = {objekte:'objekte',mieter:'mieter',mieteingang:'mieteingang',kosten:'kosten',vertraege:'vertraege',aufgaben:'aufgaben'}[store];
-  renderPage(page);
+  var pages={objekte:'objekte',mieter:'mieter',mieteingang:'mieteingang',kosten:'kosten',vertraege:'vertraege',aufgaben:'aufgaben'};
+  showPage(pages[store]);
 }
 
-// ═══════════════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════════════
 renderDashboard();
 </script>
 </body>
